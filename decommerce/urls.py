@@ -21,7 +21,13 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+
+    # ex: /category/1/
     url(r'^category/(?P<category_id>[0-9]+)/$', views.category, name='category'),
+    # ex: /product/12/
     url(r'^product/(?P<product_id>[0-9]+)/$', views.product, name='product'),
+    # ex: /search/
+    url(r'^search/$', views.search, name='search'),
+    # used to get media files
     url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
 ]

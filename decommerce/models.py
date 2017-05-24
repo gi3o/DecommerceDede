@@ -80,12 +80,13 @@ class Order(models.Model):
 
 class ProductReview(models.Model):
     product = models.ForeignKey(Product)
-    by = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    by = models.OneToOneField(User, on_delete=models.CASCADE)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)])
-    review = models.TextField()
+    title = models.CharField(max_length= 30, blank= False)
+    review = models.CharField(max_length= 280)
 
     def __str__(self):
-        return self.product.name + ", " + self.by.user.get_username() + ", " + str(self.starts) + " stars"
+        return self.product.name + ", " + str(self.stars) + " stars"
 
     class Meta:
         verbose_name = _('product review')

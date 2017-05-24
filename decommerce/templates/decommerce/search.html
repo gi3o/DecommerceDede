@@ -1,0 +1,14 @@
+{% extends 'decommerce/products_show.html' %}
+{% load i18n %}
+{% comment %}
+    Displays the products inside a category.
+{% endcomment %}
+{% block title %}Risultati Ricerca{% endblock %}
+{% block top_title %}Risultati per {{ query }}{% endblock %}
+{% block body_title %}
+    {% blocktrans count product_list.count as products %}
+        {{ products }} risultato
+        {% plural %}
+        {{ products }} risultati
+    {% endblocktrans %}
+{% endblock %}

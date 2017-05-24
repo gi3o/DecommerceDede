@@ -1,40 +1,15 @@
-{% extends "decommerce/base.html" %}
+{% extends "decommerce/products_show.html" %}
 {% comment %}
-    Index page
+    Index page.
+    Uses a list of categories displayed on the sidebar and a list of products
+    shown as a grid in the middle of the page.
+    These 2 are mandatory.
 {% endcomment %}
-{% block head %}
-    {% block title %}Benvenuto{% endblock %}
-{% endblock %}
-{% block categories %}
-    {% for category in categories %}
-        <a href="{% url 'decommerce:category' category.id %}" class="w3-bar-item w3-button">{{ category.name }}</a>
-    {% endfor %}
-{% endblock %}
-{% block content %}
-    <!-- Top header -->
-    <header class="w3-container w3-xlarge">
-        <p class="w3-left">Home</p>
-        <p class="w3-right">
-            <i class="fa fa-shopping-cart w3-margin-right"></i>
-            <i class="fa fa-search"></i>
-        </p>
-    </header>
+{% block title %}Benvenuto{% endblock %}
+{% block top_title %}Home{% endblock %}
+{% block body_title %}{{ 'Nuovi Prodotti' }}{% endblock %}
+{% block script %}
 
-    <div class="w3-container w3-text-grey">
-        <p>{{ _('Nuovi Prodotti') }}</p>
-    </div>
-
-    <!-- Product grid -->
-    <div class="w3-row w3-grayscale">
-        {% for product in product_list %}
-            <div class="w3-col l3 s6">
-                <a href="{% url 'decommerce:product' product.id %}">
-                    <div class="w3-container">
-                        <img src="{{ product.image.url }}" style="width: 100%">
-                        <p>{{ product.name }}<br><b>{{ product.price }}</b></p>
-                    </div>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
+    {% comment %} Hides the index icon from the top bar {% endcomment %}
+    document.getElementById("homeIcon").style.display = "none";
 {% endblock %}

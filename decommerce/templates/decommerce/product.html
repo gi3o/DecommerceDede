@@ -1,0 +1,95 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Displays product information and reviews.
+{% endcomment %}
+{% block title %}Product overview{% endblock %}
+{% block top_title %}Dettagli prodotto{% endblock %}
+{% block content %}
+
+    <!-- Product informations -->
+    <div class="w3-container w3-row">
+        <div class="w3-container w3-text-grey w3-col s12 m8 l9">
+            <p>
+            <h3>{{ product.name }}</h3></p>
+            <p>Venduto da: {{ product.seller }}</p>
+            <p>Prezzo: {{ product.price }} Euro</p>
+            {% if product.stock > 0 %}
+                <p class="w3-text-green">In stock</p>
+            {% else %}
+                <p class="w3-text-red">Terminato</p>
+            {% endif %}
+        </div>
+        <div class="w3-container w3-third w3-padding-32 w3-col s12 m4 l3">
+            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%;">
+        </div>
+    </div>
+
+    <!-- Product details -->
+    <div class="w3-container">
+        <p>{{ product.details }}</p>
+    </div>
+
+    <!-- Product reviews -->
+    <div class="w3-container w3-card w3-margin">
+        {% if reviews %}
+            <h5>Recensioni</h5>
+            <div class="w3-container" style="max-height: 300px; overflow-y: auto">
+                {% for review in reviews %}
+                    <div class="w3-section w3-row w3-margin-bottom w3-border-bottom">
+                        <div class="w3-container w3-row w3-text-black"><b>{{ review.title }}</b></div>
+                        <div class="w3-container w3-row w3-text-grey">By: {{ review.by }}</div>
+                        <div class="w3-container w3-row">
+                            {% with ''|center:5 as range %}
+                                {% for i in range %}
+                                    {% if forloop.counter <= review.stars %}
+                                        <i class="fa fa-star"></i>
+                                    {% else %}
+                                        <i class="fa fa-star-o"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <div class="w3-container w3-text-black">
+                            {{ review.review }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h5>Nessuna recensione</h5>
+        {% endif %}
+    </div>
+
+    <!-- Review form -->
+    <p class="w3-container">
+
+    </p>
+    <form class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" method="post" action=".">
+        <h5 class="w3-center">{% if reviews %}
+            Scrivi una recensione per questo prodotto:
+        {% else %}
+            Scrivi per primo una recensione di questo prodotto:
+        {% endif %}
+        </h5>
+        {% csrf_token %}
+        <div class="w3-row w3-section">
+            <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-star-o"></i></div>
+            <div class="w3-rest">
+                {{ review_form.stars }}
+            </div>
+        </div>
+        <div class="w3-row w3-section">
+            <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-commenting-o"></i></div>
+            <div class="w3-rest">
+                {{ review_form.title }}
+            </div>
+        </div>
+        <div class="w3-row w3-section">
+            <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-pencil-square-o"></i></div>
+            <div class="w3-rest">
+                {{ review_form.review }}
+            </div>
+        </div>
+        <input class="w3-button w3-block w3-section w3-border w3-border-black w3-ripple w3-padding" type="submit" value="Invia" />
+    </form>
+{% endblock %}

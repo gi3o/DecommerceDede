@@ -1,3 +1,10 @@
+{% comment %}
+    The base template for the site.
+    Needs a list of categories in input to show in the sidebar (or top menu on small screens).
+    Is possible to pass a "current_category" as the id of the current category, the link
+    will be displayed black instead of light grey.
+{% endcomment %}
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -8,6 +15,17 @@
     <link rel="stylesheet" type="text/css" href="{% static 'decommerce/Montserrat.css' %}">
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .w3-sidebar a {
+            font-family: "Roboto", sans-serif;
+        }
+
+        body, h1, h2, h3, h4, h5, h6, .w3-wide {
+            font-familiy: "Montserrat", sans-serif;
+        }
+
+        {% block style %}{% endblock %}
+    </style>
     <title>Decommerce | {% block title %}{% endblock %}</title>
     {% block head %}{% endblock %}
 </head>
@@ -17,16 +35,31 @@
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width: 250px;" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16">
         <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-        <h3 class="w3-wide"><b>DECOMMERCE</b></h3>
+        <a href="{% url 'decommerce:index' %}" style="text-decoration: none"><h3 class="w3-wide"><b>DECOMMERCE</b></h3>
+        </a>
     </div>
+        <form id="searchForm" class="w3-padding-64 w3-large" action="{% url 'decommerce:search' %}" method="post">
+        {% csrf_token %}
+        <input id="searchField" class="w3-container w3-input w3-margin-left w3-animate-input" name="search" type="search" placeholder="Cerca..."
+               style="font-family: Roboto, sans-serif; width: 50%; max-width: 80%">
+    </form>
     <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-        {% block categories %}{% endblock %}
+        {% for category in categories %}
+            {% if category.id == actual_category.id %}
+                <a href="{% url 'decommerce:category' category.id %}"
+                   class="w3-bar-item w3-button w3-text-black">{{ category.name }}</a>
+            {% else %}
+                <a href="{% url 'decommerce:category' category.id %}"
+                   class="w3-bar-item w3-button">{{ category.name }}</a>
+            {% endif %}
+        {% endfor %}
     </div>
 </nav>
 
 <!-- Top menu on small screens -->
 <header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
-    <div class="w3-bar-item w3-padding-24 w3-wide">DECOMMERCE</div>
+    <div class="w3-bar-item w3-padding-24 w3-wide">
+        <a href="{% url 'decommerce:index' %}" style="text-decoration: none">DECOMMERCE</a></div>
     <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()">
         <i class="fa fa-bars"></i>
     </a>
@@ -40,6 +73,17 @@
 <div class="w3-main" style="margin-left: 250px">
     <!-- Push down content on small screens -->
     <div class="w3-hide-large" style="margin-top: 83px"></div>
+
+    <!-- Top header -->
+    <header class="w3-container w3-xlarge w3-row">
+        <p class="w3-third">{% block top_title %}{% endblock %}</p>
+        <p class="w3-right">
+            <i class="fa fa-shopping-cart w3-margin-right"></i>
+            <a href="{% url 'decommerce:index' %}"><i id="homeIcon" class="fa fa-home"></i></a>
+        </p>
+
+
+    </header>
 
     {% block content %}{% endblock %}
 
@@ -66,6 +110,16 @@
         document.getElementById("mySidebar").style.display = "none";
         document.getElementById("myOverlay").style.display = "none";
     }
+
+    var searchField = document.getElementById("searchField");
+    searchField.addEventListener("input", function (e) {
+        var query = searchField.value;
+        if (query.length > 25) {
+            searchField.value = query.substring(0, query.length - 1);
+        }
+    }, false);
+
+    {% block script %}{% endblock %}
 </script>
 </body>
 </html>

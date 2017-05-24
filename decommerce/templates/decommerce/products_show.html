@@ -1,0 +1,33 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Displays products in "product_list"
+{% endcomment %}
+{% block title %}{% endblock %}
+{% block top_title %}{% endblock %}
+{% block top_icons %}{% endblock %}
+{% block content %}
+
+    <div class="w3-container w3-text-grey">
+        <p>{% block body_title %}{% endblock %}</p>
+    </div>
+
+    {% block products %}
+    <!-- Product grid -->
+    <div class="w3-row w3-grayscale">
+        {% for product in product_list %}
+            <div class="w3-col l3 s6">
+                <div class="w3-container">
+                    <div class="w3-display-container">
+                        <img src="{{ product.image.url }}" style="width: 100%">
+                        <div class="w3-display-middle w3-display-hover">
+                            <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
+                                    class="fa fa-info"></i> Dettagli</a>
+                        </div>
+                        <p>{{ product.name }}<br><b>{{ product.price }} Euro</b></p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+        {% endblock %}
+{% endblock %}

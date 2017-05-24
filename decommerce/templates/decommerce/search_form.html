@@ -1,0 +1,27 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Shows a form where the user can perform search queries
+{% endcomment %}
+{% block title %}Cerca{% endblock %}
+{% block top_title %}Cerca{% endblock %}
+{% block content %}
+    <form class="w3-padding-64 w3-large" action="{% url 'decommerce:search' %}" method="post">
+        {% csrf_token %}
+        <input id="searchFieldBig" class="w3-container w3-input w3-margin-right" name="Search" type="search"
+               placeholder="Cerca..."
+               style="font-family: Roboto, sans-serif;">
+    </form>
+    <p id="counter"></p>
+{% endblock %}
+{% block script %}
+    {% comment %} Hides the search from from sidebar {% endcomment %}
+    document.getElementById("searchForm").style.display = "none";
+
+    var searchField = document.getElementById("searchFieldBig");
+    searchField.addEventListener("input", function (e) {
+        var query = searchField.value;
+        if (query.length > 25) {
+            searchField.value = query.substring(0, query.length - 1);
+        }
+    }, false);
+{% endblock %}

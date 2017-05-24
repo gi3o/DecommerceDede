@@ -83,7 +83,7 @@ admin.site.register(Order, OrderAdmin)
 class ProductReviewAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Info', {'fields':['product', 'by']}),
-        ('Review', {'fields':['stars', 'review'], 'classes':['collapse']}),
+        ('Review', {'fields':['title', 'stars', 'review'], 'classes':['collapse']}),
     ]
     list_display = ['by', 'product', 'stars']
     list_filter = ['stars', 'by']
