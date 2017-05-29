@@ -15,6 +15,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'decommerce/Montserrat.css' %}">
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-16x16.png' %}" sizes="16x16" />
     <style>
         .w3-sidebar a {
             font-family: "Roboto", sans-serif;
@@ -35,7 +37,7 @@
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width: 250px;" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16">
         <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-        <a href="{% url 'decommerce:index' %}" style="text-decoration: none"><h3 class="w3-wide"><b>DECOMMERCE</b></h3>
+        <a href="{% url 'decommerce:index' %}" title="DECOMMERCE | Home" style="text-decoration: none"><h3 class="w3-wide"><b>DECOMMERCE</b></h3>
         </a>
     </div>
         <form id="searchForm" class="w3-padding-64 w3-large" action="{% url 'decommerce:search' %}" method="post">
@@ -46,7 +48,7 @@
     <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
         {% for category in categories %}
             {% if category.id == actual_category.id %}
-                <a href="{% url 'decommerce:category' category.id %}"
+                <a href="{% url 'decommerce:category' category.id %}" title="{{ category.name }}"
                    class="w3-bar-item w3-button w3-text-black">{{ category.name }}</a>
             {% else %}
                 <a href="{% url 'decommerce:category' category.id %}"
@@ -79,7 +81,12 @@
         <p class="w3-third">{% block top_title %}{% endblock %}</p>
         <p class="w3-right">
             <i class="fa fa-shopping-cart w3-margin-right"></i>
-            <a href="{% url 'decommerce:index' %}"><i id="homeIcon" class="fa fa-home"></i></a>
+            <a href="{% url 'decommerce:index' %}" title="Home"><i id="homeIcon" class="fa fa-home w3-margin-right"></i></a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'decommerce:logout' %}" title="Logout"><i id="logoutIcon" class="fa fa-sign-out w3-margin-right"></i></a>
+            {% else %}
+                <a href="{% url 'decommerce:login' %}" title="Login"><i id="loginIcon" class="fa fa-sign-in w3-margin-right"></i></a>
+            {% endif %}
         </p>
 
 
@@ -94,7 +101,6 @@
                               class="w3-hover-opacity">
             Django
         </a>
-
     </div>
 </div>
 

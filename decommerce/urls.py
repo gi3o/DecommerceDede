@@ -14,20 +14,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.views import static
 
 from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-
     # ex: /category/1/
     url(r'^category/(?P<category_id>[0-9]+)/$', views.category, name='category'),
     # ex: /product/12/
     url(r'^product/(?P<product_id>[0-9]+)/$', views.product, name='product'),
     # ex: /search/
     url(r'^search/$', views.search, name='search'),
+    # ex: /logout/
+    url(r'^logout/$', views.logout_view, name='logout'),
+    # used to handle login
+    url(r'^login/$', views.login_view, name='login'),
     # used to get media files
     url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
 ]

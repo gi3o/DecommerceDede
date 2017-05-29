@@ -1,6 +1,5 @@
 from django import forms
 
-from decommerce.models import ProductReview
 
 CHOICES=[(1, '1'),
          (2, '2'),
@@ -15,3 +14,8 @@ class ProductReviewForm(forms.Form):
                                 attrs= {'class':'w3-input w3-margin-bottom', 'placeholder':'Titolo'}))
     review = forms.CharField(max_length= 280, widget= forms.Textarea(
                                  attrs= {'class':'w3-input', 'placeholder':'Review'}))
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label = 'Username', widget= forms.TextInput(
+                                attrs={'class':'w3-input w3-margin-bottom', 'placeholder':'Username'}))
+    password = forms.CharField(widget=forms.PasswordInput())

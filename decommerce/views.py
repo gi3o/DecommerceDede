@@ -1,8 +1,11 @@
+from django.contrib.auth import logout, authenticate, login
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm
-from .models import Category, Product, ProductReview
+from decommerce.forms import ProductReviewForm, LoginForm
+from .models import Category, Product, ProductReview, UserProfile
+from django.contrib.auth.decorators import user_passes_test, login_required
 
 
 # Create your views here.
@@ -20,9 +23,14 @@ def category(request, category_id):
     return render(request, 'decommerce/category.html',
                   context={'actual_category': category, 'categories': categories, 'product_list': products})
 
+def check_user_profile(user):
+    return user.is_authenticated() and UserProfile.objects.filter(user = user).exists()
+
 
 def product(request, product_id):
     if request.method == 'POST':
+        if not request.user.is_authenticated():
+            return render(request, 'templates/login.html', context={'next':request.path})
         form = ProductReviewForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
@@ -36,9 +44,14 @@ def product(request, product_id):
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
         review_form = ProductReviewForm()
-        return render(request, 'decommerce/product.html',
-                      context={'actual_category': category, 'categories': categories, 'product': product,
-                               'reviews': reviews, 'review_form':review_form})
+        if reviews.filter(by = request.user).exists():
+            return render(request, 'decommerce/product.html',
+                        context={'actual_category': category, 'categories': categories, 'product': product,
+                                'reviews': reviews, 'review_form': review_form, 'already_written': True})
+        else:
+            return render(request, 'decommerce/product.html',
+                          context={'actual_category': category, 'categories': categories, 'product': product,
+                                   'reviews': reviews, 'review_form': review_form})
 
 def search(request):
     if request.method == 'POST':
@@ -50,3 +63,26 @@ def search(request):
                       context={'categories': categories, 'query': query, 'product_list': query_set})
     else:
         return render(request, 'decommerce/search_form.html', context={'categories': Category.objects.all()})
+
+def login_view(request):
+    if request.method == 'POST':
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            data = login_form.cleaned_data
+            user = authenticate(username = data['username'], password = data['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect('/')
+                else:
+                    return render(request, 'decommerce/login.html', context={'disabled_account':True, 'form':LoginForm()})
+            else:
+                return render(request, 'decommerce/login.html', context={'login_error':True, 'form':LoginForm()})
+    else:
+        categories = Category.objects.all()
+        login_form = LoginForm()
+        return render(request, 'decommerce/login.html', context={'form':login_form, 'categories':categories})
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/')
