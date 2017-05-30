@@ -28,7 +28,7 @@ class UserProfile(models.Model):
 
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    store_name = models.CharField(max_length=40)
+    store_name = models.CharField(max_length=40, unique= True, blank= False)
 
     def __str__(self):
         return self.store_name
@@ -40,12 +40,12 @@ def content_file_name(instance, filename):
     return '/'.join(['photos', str(instance.seller.user), get_random_string(length=32)])
 
 class Product(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(Category)
+    name = models.CharField(max_length=100, blank= False)
+    category = models.ForeignKey(Category, blank= False)
     details = models.TextField()
-    price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank= False)
     image = models.ImageField(blank= False, upload_to=content_file_name)
-    seller = models.ForeignKey(SellerProfile)
+    seller = models.ForeignKey(SellerProfile, blank= False)
     stock = models.PositiveIntegerField()
     added = models.DateTimeField(default= timezone.now)
 

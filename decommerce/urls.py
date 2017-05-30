@@ -28,9 +28,11 @@ urlpatterns = [
     # ex: /search/
     url(r'^search/$', views.search, name='search'),
     # ex: /logout/
-    url(r'^logout/$', views.logout_view, name='logout'),
+    url(r'^logout/$', views.logout, name='logout'),
     # used to handle login
-    url(r'^login/$', views.login_view, name='login'),
+    url(r'^login/$', views.login, name='login'),
+    # used to handle registration
+    url(r'^register/$', views.register, name = 'register'),
     # used to get media files
     url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
 ]

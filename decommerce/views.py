@@ -1,11 +1,10 @@
 from django.contrib.auth import logout, authenticate, login
-from django.db import IntegrityError
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm, LoginForm
+from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm
 from .models import Category, Product, ProductReview, UserProfile
-from django.contrib.auth.decorators import user_passes_test, login_required
 
 
 # Create your views here.
@@ -64,7 +63,7 @@ def search(request):
     else:
         return render(request, 'decommerce/search_form.html', context={'categories': Category.objects.all()})
 
-def login_view(request):
+def login(request):
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
         if login_form.is_valid():
@@ -75,14 +74,30 @@ def login_view(request):
                     login(request, user)
                     return HttpResponseRedirect('/')
                 else:
-                    return render(request, 'decommerce/login.html', context={'disabled_account':True, 'form':LoginForm()})
+                    return render(request, 'decommerce/login.html',
+                                  context={'login_error':'Il tuo account è stato disabilitato', 'form':LoginForm()})
             else:
-                return render(request, 'decommerce/login.html', context={'login_error':True, 'form':LoginForm()})
+                return render(request, 'decommerce/login.html',
+                              context={'login_error':'Username e password non corrispondono', 'form':LoginForm()})
     else:
         categories = Category.objects.all()
         login_form = LoginForm()
         return render(request, 'decommerce/login.html', context={'form':login_form, 'categories':categories})
 
-def logout_view(request):
+def logout(request):
     logout(request)
     return HttpResponseRedirect('/')
+
+def register(request):
+    if request.method == 'POST':
+        register_form = RegisterForm(request.POST)
+        if register_form.is_valid():
+            data = register_form.cleaned_data
+            user = User.objects.create_user(username=data['username'], email=data['mail'], password=data['password'])
+            if data['type'] == 'Compratore':
+                userProfile = UserProfile(user = user, nationality= data['nationality'], address= data['address'])
+
+    else:
+        register_form = RegisterForm()
+        categories = Category.objects.all()
+        return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':categories})

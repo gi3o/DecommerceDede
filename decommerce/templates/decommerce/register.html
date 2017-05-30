@@ -1,0 +1,51 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Main page to register users
+{% endcomment %}
+{% block title %}Registrati{% endblock %}
+{% block top_title %}Registrati{% endblock %}
+{% block content %}
+    <section class="w3-container w3-margin-bottom">
+        {% if registration_error %}
+            <p>{{ registration_error }}</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="w3-row w3-section">
+                <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-envelope-o"></i></div>
+                <div class="w3-rest">
+                    {{ form.mail }}
+                </div>
+            </div>
+            <div class="w3-row w3-section">
+                <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-user-o"></i></div>
+                <div class="w3-rest">
+                    {{ form.username }}
+                </div>
+            </div>
+            <div class="w3-row w3-section">
+                <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-key"></i></div>
+                <div class="w3-rest">
+                    {{ form.password }}
+                </div>
+            </div>
+            <div class="w3-row w3-section">
+                <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-check-circle-o"></i></div>
+                <div class="w3-rest">
+                    {{ form.type }}
+                </div>
+            </div>
+            <input class="w3-input w3-quarter" type="submit" value="Registrati">
+        </form>
+        <p id="test"></p>
+    </section>
+{% endblock %}
+{% block script %}
+
+        var typeSelector = document.getElementById("id_type").addEventListener("change", changeType, false);
+        function changeType() {
+            var selectedValue = typeSelector.options[typeSelector.selectedIndex].value;
+            document.getElementById("test").innerHTML = selectedValue;
+        }
+
+{% endblock %}
