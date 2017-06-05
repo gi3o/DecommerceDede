@@ -14,10 +14,16 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = _('category')
+        
+NATION_CHOICES = [('ITA', 'Italia'),
+                  ('ENG', 'Ingilterra'),
+                  ('USA', 'Stati Uniti'),
+                  ('FRA', 'Francia'),
+                  ('SPA', 'Spagna')]
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nationality = models.CharField(max_length=3, validators=[MinLengthValidator(3)])
+    nationality = models.CharField(max_length=3, validators=[MinLengthValidator(3)], choices = NATION_CHOICES)
     address = models.CharField(max_length=50)
 
     def __str__(self):
@@ -54,11 +60,17 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = _('product')
+        
+STAR_CHOICES=[(1, '1'),
+         (2, '2'),
+         (3, '3'),
+         (4, '4'),
+         (5, '5')]
 
 class SellerReview(models.Model):
     seller = models.ForeignKey(SellerProfile)
     by = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)])
+    stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices = STAR_CHOICES)
     review = models.TextField()
 
     def __str__(self):
@@ -81,7 +93,7 @@ class Order(models.Model):
 class ProductReview(models.Model):
     product = models.ForeignKey(Product)
     by = models.OneToOneField(User, on_delete=models.CASCADE)
-    stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)])
+    stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices = STAR_CHOICES)
     title = models.CharField(max_length= 30, blank= False)
     review = models.CharField(max_length= 280)
 

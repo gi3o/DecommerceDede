@@ -27,10 +27,12 @@ urlpatterns = [
     url(r'^product/(?P<product_id>[0-9]+)/$', views.product, name='product'),
     # ex: /search/
     url(r'^search/$', views.search, name='search'),
+    # ex: /account/131
+    url(r'^account/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
     # ex: /logout/
-    url(r'^logout/$', views.logout, name='logout'),
+    url(r'^logout/$', views.logout_view, name='logout'),
     # used to handle login
-    url(r'^login/$', views.login, name='login'),
+    url(r'^login/$', views.login_view, name='login'),
     # used to handle registration
     url(r'^register/$', views.register, name = 'register'),
     # used to get media files

@@ -83,8 +83,10 @@
             <i class="fa fa-shopping-cart w3-margin-right"></i>
             <a href="{% url 'decommerce:index' %}" title="Home"><i id="homeIcon" class="fa fa-home w3-margin-right"></i></a>
             {% if request.user.is_authenticated %}
+                <a href="{% url 'decommerce:profile' request.user.id %}" title="Profilo"><i id="profileIcon" class="fa fa-user w3-margin-right"></i></a>
                 <a href="{% url 'decommerce:logout' %}" title="Logout"><i id="logoutIcon" class="fa fa-sign-out w3-margin-right"></i></a>
             {% else %}
+                <a href="{% url 'decommerce:register' %}" title="Registrati"><i id="registerIcon" class="fa fa-user-plus w3-margin-right"></i></a>
                 <a href="{% url 'decommerce:login' %}" title="Login"><i id="loginIcon" class="fa fa-sign-in w3-margin-right"></i></a>
             {% endif %}
         </p>

@@ -1,11 +1,12 @@
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm
-from .models import Category, Product, ProductReview, UserProfile
-
+from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm
+from .models import Category, Product, ProductReview, UserProfile, SellerProfile
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # Create your views here.
 def index(request):
@@ -63,7 +64,7 @@ def search(request):
     else:
         return render(request, 'decommerce/search_form.html', context={'categories': Category.objects.all()})
 
-def login(request):
+def login_view(request):
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
         if login_form.is_valid():
@@ -84,7 +85,7 @@ def login(request):
         login_form = LoginForm()
         return render(request, 'decommerce/login.html', context={'form':login_form, 'categories':categories})
 
-def logout(request):
+def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
 
@@ -93,11 +94,64 @@ def register(request):
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             data = register_form.cleaned_data
-            user = User.objects.create_user(username=data['username'], email=data['mail'], password=data['password'])
+            if User.objects.filter(email = data['mail']).exists():
+                return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':Category.objects.all(),
+                        'registration_error':'Questo indirizzo email è già in uso'})
+            try:
+                user = User.objects.create_user(username=data['username'], email=data['mail'], password=data['password'])
+            except IntegrityError as e:
+                return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':Category.objects.all(),
+                    'registration_error':e.__cause__})
             if data['type'] == 'Compratore':
                 userProfile = UserProfile(user = user, nationality= data['nationality'], address= data['address'])
-
+                userProfile.save()
+            elif data['type'] == 'Venditore':
+                sellerProfile = SellerProfile(user = user, store_name = data['store_name'])
+                sellerProfile.save()
+            login(request, user)
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':Category.objects.all(),
+                'registration_error':register_form.errors})
     else:
         register_form = RegisterForm()
         categories = Category.objects.all()
         return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':categories})
+        
+@login_required
+def seller_profile(request, user):
+    seller = SellerProfile.objects.get(user = user)
+    products = Product.objects.filter(seller = seller)
+    upload_product_form = UploadProductForm()
+    
+    return render(request, 'decommerce/seller_profile.html', 
+            context={'seller':seller, 'categories':Category.objects.all(), 'products':products, 'form':upload_product_form})
+    
+@login_required
+def buyer_profile(request, user):
+    buyer = UserProfile.objects.get(user = user)
+    return HttpResponse("You're " + user.get_username() + " you live in " + buyer.address + ", " + buyer.nationality)
+       
+@login_required
+def profile(request, user_id):
+    if str(request.user.id) != user_id:
+        return HttpResponse('You\'re not the selected user')
+    user = User.objects.get(pk = user_id)
+    if UserProfile.objects.filter(user = user).exists():
+        return buyer_profile(request, user)
+    elif SellerProfile.objects.filter(user = user).exists():
+        return seller_profile(request, user)
+    else:
+        return HttpResponse('You\'re user: ' + user.get_username())
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

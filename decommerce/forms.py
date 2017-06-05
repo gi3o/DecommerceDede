@@ -1,21 +1,24 @@
 from django import forms
-from django.contrib.auth.password_validation import MinimumLengthValidator, UserAttributeSimilarityValidator, \
-    CommonPasswordValidator, NumericPasswordValidator
+from django.forms import ModelForm, Select, TextInput, Textarea
+from .models import Product, ProductReview, Category
 
-STAR_CHOICES=[(1, '1'),
-         (2, '2'),
-         (3, '3'),
-         (4, '4'),
-         (5, '5')]
-
-
+class ProductReviewForm(ModelForm):
+    class Meta:
+        model = ProductReview
+        fields = ['stars', 'title', 'review']
+        widgets = {
+            'stars': Select(attrs={'class':'w3-select w3-input w3-light-gray w3-border-0'}),
+            'title': TextInput(attrs={'class':'w3-input w3-margin-bottom', 'placeholder':'Titolo'}),
+            'review': Textarea(attrs={'class':'w3-input', 'placeholder':'Recensione'})
+            }
+"""
 class ProductReviewForm(forms.Form):
     stars = forms.ChoiceField(choices= STAR_CHOICES, label= 'Stelle', widget= forms.Select(
                               attrs={'class':'w3-select w3-input w3-light-gray w3-border-0'}))
     title = forms.CharField(max_length= 30, widget= forms.TextInput(
                                 attrs= {'class':'w3-input w3-margin-bottom', 'placeholder':'Titolo'}))
     review = forms.CharField(max_length= 280, widget= forms.Textarea(
-                                 attrs= {'class':'w3-input', 'placeholder':'Review'}))
+                                 attrs= {'class':'w3-input', 'placeholder':'Review'}))"""
 
 class LoginForm(forms.Form):
     username = forms.CharField(label = 'Username', widget= forms.TextInput(
@@ -35,16 +38,27 @@ class RegisterForm(forms.Form):
     username = forms.CharField(max_length=30, label = 'Username', widget= forms.TextInput(
                                 attrs={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Username'}))
     password = forms.CharField(label = 'Password',
-                               validators= [MinimumLengthValidator(), UserAttributeSimilarityValidator(),
-                                            CommonPasswordValidator(), NumericPasswordValidator()],
                                widget=forms.PasswordInput(
                                    attrs={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Password'}))
     type = forms.ChoiceField(label='Tipo', choices=REGISTER_CHOICES, widget=forms.Select(
                                 attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}))
     nationality = forms.ChoiceField(label='Nazionalità', choices=NATION_CHOICES, widget=forms.Select(
-                                    attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}))
-    address = forms.ChoiceField(label='Indirizzo', widget= forms.Select(
-                                attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}))
-    store_name = forms.CharField(max_length=40)
+                                    attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}),
+                                    required= False)
+    address = forms.CharField(max_length = 60, label='Indirizzo', widget= forms.TextInput(
+                                attrs={'class':'w3-select w3-input w3-margin-bottom w3-third', 'placeholder':'Indirizzo'}),
+                                required = False)
+    store_name = forms.CharField(max_length=40, label = 'Nome negozio', widget = forms.TextInput(
+                                 attrs ={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Nome negozio'}),
+                                 required= False)
+                                 
+class UploadProductForm(ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'category', 'details', 'price', 'image', 'stock']
+        widgets = {
+            'name':TextInput(attrs={'class':'w3-input', 'placeholder':'Nome Prodotto'}),
+            'category': Select(choices = Category.objects.all(), attrs={'class':'w3-select w3-input'}),
+            }
 
 

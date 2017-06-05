@@ -1,0 +1,39 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Display seller informations, the user can also upload a new product
+{% endcomment %}
+{% block title %}{{ seller.store_name }}{% endblock %}
+{% block top_title %}{{ seller.store_name }}{% endblock %}
+{% block content %}
+
+    <div class="w3-container">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </form>
+    </div>
+
+
+    <!-- Product grid -->
+    <div class="w3-row w3-grayscale w3-container">
+        {% if products %}
+            <p>I tuoi prodotti</p>
+            {% for product in products %}
+                <div class="w3-col l3 s6">
+                    <div class="w3-container">
+                        <div class="w3-display-container">
+                            <img src="{{ product.image.url }}" style="width: 100%">
+                            <div class="w3-display-middle w3-display-hover">
+                                <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
+                                        class="fa fa-info"></i> Dettagli</a>
+                            </div>
+                            <p>{{ product.name }}<br><b>{{ product.price }} Euro</b></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Non ci sono prodotti da mostrare</p>
+        {% endif %}
+        </div>
+{% endblock %}
