@@ -1,0 +1,30 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Shows the details of a product, such the remaining stock, the orders made for the product etc.
+{% endcomment %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block top_title %}{{ product.name }} - Dettagli{% endblock %}
+{% block content %}
+    <div class="w3-container w3-row">
+        {% if product.stock > 20 %}
+            <p class="w3-text-green w3-col">Stock: {{ product.stock }} pezzi</p>
+        {% elif product.stock < 20 and product.stock > 0 %}
+            <p class="w3-text-orange w3-col">Stock: {{ product.stock }} pezzi</p>
+        {% else %}
+            <p class="w3-text-red w3-col">Stock terminato</p>
+        {% endif %}
+        <button class="w3-button w3-col">Aggiungi stock</button>
+    </div>
+{% endblock %}
+{% block script %}
+    var topMenu = document.getElementById('topMenu');
+    var mySidebar = document.getElementById('mySidebar');
+    var contentDiv = document.getElementById('contentDiv');
+    var hideLargeDiv = document.getElementById('hideLargeDiv');
+    var iconParagraph = document.getElementById('iconParagraph');
+    mySidebar.style.width = 0;
+    contentDiv.style.marginLeft = 0;
+    hideLargeDiv.style.display = 'none';
+    iconParagraph.style.display = 'none';
+    topMenu.style.display = 'none';
+{% endblock %}

@@ -1,21 +1,69 @@
 {% extends 'decommerce/base.html' %}
 {% comment %}
-    Display seller informations, the user can also upload a new product
+    Displays seller informations, the user can also upload a new product
 {% endcomment %}
 {% block title %}{{ seller.store_name }}{% endblock %}
-{% block top_title %}{{ seller.store_name }}{% endblock %}
+{% block top_title %}{{ seller.store_name }} - Profilo{% endblock %}
 {% block content %}
 
-    <div class="w3-container">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-        </form>
+    <button onclick="expandModal('addProductDiv')" class="w3-button w3-left-align">Aggiungi un prodotto</button>
+
+    <div id="addProductDiv" class="modal">
+        <div class="modal-content">
+            <form method="post" action="{% url 'decommerce:add_product' request.user.id %}"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="w3-container w3-padding w3-dark-grey">
+                    <span class="close" onclick="closeModal('addProductDiv')">&times;</span>
+                    <h2>Aggiungi Prodotto</h2>
+                </div>
+                <div class="w3-padding">
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-archive"></i></div>
+                        <div class="w3-rest w3-threequarter">
+                            {{ product_form.name }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-threequarter w3-margin-right">
+                            {{ product_form.category }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-info"></i></div>
+                        <div class="w3-rest w3-threequarter">
+                            {{ product_form.details }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-eur"></i></div>
+                        <div class="w3-rest w3-third">
+                            {{ product_form.price }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-file-image-o"></i></div>
+                        <div class="w3-rest w3-third">
+                            {{ product_form.image }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-th"></i></div>
+                        <div class="w3-rest w3-third">
+                            {{ product_form.stock }}
+                        </div>
+                    </div>
+                </div>
+                <div class="w3-container w3-padding w3-light-grey">
+                    <input class="w3-button w3-quarter w3-border-bottom w3-right" type="submit" value="Aggiungi"/>
+                </div>
+            </form>
+        </div>
     </div>
 
-
+    <button onclick="expand('ProductList')" class="w3-button w3-block w3-left-align">Prodotti del negozio</button>
     <!-- Product grid -->
-    <div class="w3-row w3-grayscale w3-container">
+    <div id="ProductList" class="w3-row w3-card w3-grayscale w3-container w3-hide w3-show">
         {% if products %}
             <p>I tuoi prodotti</p>
             {% for product in products %}
@@ -23,9 +71,13 @@
                     <div class="w3-container">
                         <div class="w3-display-container">
                             <img src="{{ product.image.url }}" style="width: 100%">
-                            <div class="w3-display-middle w3-display-hover">
-                                <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
-                                        class="fa fa-info"></i> Dettagli</a>
+                            <div class="w3-display-middle w3-display-hover w3-center">
+                                <a class="w3-btn w3-black" href="javascript:Popup('{% url 'decommerce:product_details' product.id %}')">
+                                    <i class="fa fa-bar-chart"></i> Statistiche
+                                </a>
+                                <a class="w3-btn w3-black" href="{% url 'decommerce:remove_product' product.id %}">
+                                    <i class="fa fa-times"></i> Elimina
+                                </a>
                             </div>
                             <p>{{ product.name }}<br><b>{{ product.price }} Euro</b></p>
                         </div>
@@ -35,5 +87,92 @@
         {% else %}
             <p>Non ci sono prodotti da mostrare</p>
         {% endif %}
-        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    function expand(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+
+    function expandModal(id) {
+        var modal = document.getElementById(id);
+        if (window.innerWidth > 992 ) {
+            modal.style.paddingLeft = '25%';
+        } else {
+            modal.style.paddingLeft = 0;
+        }
+
+        modal.style.display = "block";
+    }
+
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        modal.style.display = "none";
+    }
+
+    var style = "top=10, left=10, width=800, height=600, status=no, menubar=no, toolbar=no scrollbars=no";
+
+    function Popup(page) {
+        window.open(page, "", style);
+    }
+
+{% endblock %}
+{% block style %}
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 100px;
+        padding-left: 200px;
+        left: 0;
+        top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    }
+
+    @-webkit-keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+    }
+
+    @keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+    }
+
+    .close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    }
 {% endblock %}

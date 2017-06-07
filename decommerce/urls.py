@@ -29,6 +29,14 @@ urlpatterns = [
     url(r'^search/$', views.search, name='search'),
     # ex: /account/131
     url(r'^account/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
+    # ex: /add_product
+    url(r'^add_product/(?P<user_id>[0-9]+)/$', views.add_product, name='add_product'),
+    # ex: /add_category
+    url(r'^add_category/$', views.add_category, name='add_category'),
+    # ex: /remove_product/143
+    url(r'^remove_product/(?P<product_id>[0-9]+)/$', views.remove_product, name='remove_product'),
+    # ex: /product_details/32
+    url(r'^product_details/(?P<product_id>[0-9]+)/$', views.product_details, name='product_details'),
     # ex: /logout/
     url(r'^logout/$', views.logout_view, name='logout'),
     # used to handle login

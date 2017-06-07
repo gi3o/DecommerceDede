@@ -1,6 +1,7 @@
 from django import forms
-from django.forms import ModelForm, Select, TextInput, Textarea
-from .models import Product, ProductReview, Category
+from django.forms import ModelForm, Select, TextInput, Textarea, IntegerField, NumberInput, FileInput, ModelChoiceField
+from .models import Product, ProductReview, Category, SellerProfile
+
 
 class ProductReviewForm(ModelForm):
     class Meta:
@@ -51,7 +52,7 @@ class RegisterForm(forms.Form):
     store_name = forms.CharField(max_length=40, label = 'Nome negozio', widget = forms.TextInput(
                                  attrs ={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Nome negozio'}),
                                  required= False)
-                                 
+
 class UploadProductForm(ModelForm):
     class Meta:
         model = Product
@@ -59,6 +60,18 @@ class UploadProductForm(ModelForm):
         widgets = {
             'name':TextInput(attrs={'class':'w3-input', 'placeholder':'Nome Prodotto'}),
             'category': Select(choices = Category.objects.all(), attrs={'class':'w3-select w3-input'}),
+            'details': Textarea(attrs={'class':'w3-input', 'placeholder':'Dettagli'}),
+            'price': NumberInput(attrs={'class':'w3-input'}),
+            'stock': NumberInput(attrs={'class':'w3-input'}),
+            'image': FileInput(),
             }
+
+class AddCategoryForm(ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']
+        widgets = {
+            'name': TextInput(attrs={'class':'w3-input', 'placeholder':'Nome Categoria'}),
+        }
 
 

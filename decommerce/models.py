@@ -43,7 +43,7 @@ class SellerProfile(models.Model):
         verbose_name = _('seller profile')
 
 def content_file_name(instance, filename):
-    return '/'.join(['photos', str(instance.seller.user), get_random_string(length=32)])
+    return '/'.join(['photos', instance.seller.user.username, get_random_string(length=32)])
 
 class Product(models.Model):
     name = models.CharField(max_length=100, blank= False)
@@ -57,6 +57,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name + ", " + self.seller.store_name
+
+    def delete(self, *args, **kwargs):
+        storage, path = self.image.storage, self.image.path
+        super(Product, self).delete(*args, **kwargs)
+        storage.delete(path)
+
+    def decrease_stock(self, quantity):
+        self.stock -= quantity
+
+    def increase_stock(self, quantity):
+        self.stock += quantity
 
     class Meta:
         verbose_name = _('product')
@@ -81,11 +92,11 @@ class SellerReview(models.Model):
 
 class Order(models.Model):
     product = models.ForeignKey(Product)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user= models.ForeignKey(UserProfile)
     quantity = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.product.name + ", " + self.user.user.get_username() + ", " + self.quantity
+        return self.product.name + ", " + self.user.user.get_username() + ", " + str(self.quantity)
 
     class Meta:
         verbose_name = _('order')

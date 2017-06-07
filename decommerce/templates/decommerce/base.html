@@ -45,6 +45,7 @@
         <input id="searchField" class="w3-container w3-input w3-margin-left w3-animate-input" name="search" type="search" placeholder="Cerca..."
                style="font-family: Roboto, sans-serif; width: 50%; max-width: 80%">
     </form>
+    {% block sidebar %}{% endblock %}
     <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
         {% for category in categories %}
             {% if category.id == actual_category.id %}
@@ -59,7 +60,7 @@
 </nav>
 
 <!-- Top menu on small screens -->
-<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+<header id="topMenu" class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
     <div class="w3-bar-item w3-padding-24 w3-wide">
         <a href="{% url 'decommerce:index' %}" style="text-decoration: none">DECOMMERCE</a></div>
     <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()">
@@ -72,14 +73,14 @@
      id="myOverlay"></div>
 
 <!-- Page content -->
-<div class="w3-main" style="margin-left: 250px">
+<div class="w3-main" id="contentDiv" style="margin-left: 250px">
     <!-- Push down content on small screens -->
-    <div class="w3-hide-large" style="margin-top: 83px"></div>
+    <div class="w3-hide-large" id="hideLargeDiv" style="margin-top: 83px"></div>
 
     <!-- Top header -->
     <header class="w3-container w3-xlarge w3-row">
         <p class="w3-third">{% block top_title %}{% endblock %}</p>
-        <p class="w3-right">
+        <p class="w3-right" id="iconParagraph">
             <i class="fa fa-shopping-cart w3-margin-right"></i>
             <a href="{% url 'decommerce:index' %}" title="Home"><i id="homeIcon" class="fa fa-home w3-margin-right"></i></a>
             {% if request.user.is_authenticated %}
@@ -107,7 +108,7 @@
 </div>
 
 
-<script>
+<script type="text/javascript">
     //Script to open and close sidebar
     function w3_open() {
         document.getElementById("mySidebar").style.display = "block";
