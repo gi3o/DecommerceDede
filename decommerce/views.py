@@ -184,7 +184,22 @@ def remove_product(request, product_id):
 def product_details(request, product_id):
     product = get_object_or_404(Product, pk = product_id)
     orders = Order.objects.filter(product = product)
-    return render(request, 'decommerce/product_details.html', context={'product':product, 'orders':orders})
+    nations = UserProfile._meta.get_field('nationality').choices
+    nations_values = [i[0] for i in nations]
+    nations_orders = dict.fromkeys(nations_values, 0)
+    for nation in [order.user.nationality for order in orders]:
+        nations_orders[nation] = nations_orders[nation] + 1
+    if request.method == 'POST':
+        amount = int(request.POST['stock'])
+        print('Increase by', amount)
+        if amount > 0:
+            product.increase_stock(amount)
+            return HttpResponseRedirect(request.get_full_path())
+        else:
+            return render(request, 'decommerce/product_details.html', 
+                          context={'product':product, 'orders':orders, 'error_message':'Il numero di oggetti deve essere positivo', 'nation_orders':nations_orders})
+    else:
+        return render(request, 'decommerce/product_details.html', context={'product':product, 'orders':orders, 'nation_orders':nations_orders})
 
 
     

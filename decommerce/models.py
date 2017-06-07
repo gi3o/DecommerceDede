@@ -64,10 +64,12 @@ class Product(models.Model):
         storage.delete(path)
 
     def decrease_stock(self, quantity):
-        self.stock -= quantity
+        if quantity < self.stock:
+            self.stock -= quantity
 
     def increase_stock(self, quantity):
         self.stock += quantity
+        self.save()
 
     class Meta:
         verbose_name = _('product')
@@ -94,6 +96,7 @@ class Order(models.Model):
     product = models.ForeignKey(Product)
     user= models.ForeignKey(UserProfile)
     quantity = models.PositiveIntegerField()
+    date = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
         return self.product.name + ", " + self.user.user.get_username() + ", " + str(self.quantity)
