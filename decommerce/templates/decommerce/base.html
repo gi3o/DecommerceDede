@@ -15,17 +15,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'decommerce/Montserrat.css' %}">
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'decommerce/base.css' %}">
     <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-32x32.png' %}" sizes="32x32" />
     <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-16x16.png' %}" sizes="16x16" />
     <style>
-        .w3-sidebar a {
-            font-family: "Roboto", sans-serif;
-        }
-
-        body, h1, h2, h3, h4, h5, h6, .w3-wide {
-            font-familiy: "Montserrat", sans-serif;
-        }
-
         {% block style %}{% endblock %}
     </style>
     <title>Decommerce | {% block title %}{% endblock %}</title>
@@ -127,6 +120,34 @@
             searchField.value = query.substring(0, query.length - 1);
         }
     }, false);
+    
+    function expand(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+
+    function expandModal(id) {
+        var modal = document.getElementById(id);
+        if (window.innerWidth > 992 ) {
+            modal.style.paddingLeft = '25%';
+        } else {
+            modal.style.paddingLeft = 0;
+        }
+
+        modal.style.display = "block";
+    }
+
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        modal.style.display = "none";
+    }
+
+    var style = "top=10, left=10, width=800, height=600, status=no, menubar=no, toolbar=no scrollbars=no";
+
 
     {% block script %}{% endblock %}
 </script>

@@ -75,4 +75,14 @@ class SellerReviewForm(ModelForm):
             'title': TextInput(attrs={'class': 'w3-input w3-margin-bottom', 'placeholder': 'Titolo'}),
             'review': Textarea(attrs={'class': 'w3-input', 'placeholder': 'Recensione'})
         }
-
+        
+class ModifyUserDataForm(forms.Form):
+    mail = forms.EmailField(label='E-mail', widget= forms.TextInput(
+                            attrs={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'E-mail'}))
+    nationality = forms.ChoiceField(label='Nazionalità', choices=NATION_CHOICES, widget=forms.Select(
+                                    attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}),
+                                    required= False)
+    address = forms.CharField(max_length = 60, label='Indirizzo', widget= forms.TextInput(
+                                attrs={'class':'w3-select w3-input w3-margin-bottom w3-third', 'placeholder':'Indirizzo'}),
+                                required = False)
+    

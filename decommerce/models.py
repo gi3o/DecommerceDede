@@ -118,7 +118,7 @@ class SellerReview(models.Model):
 
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete= models.CASCADE)
-    user= models.ForeignKey(UserProfile)
+    user = models.ForeignKey(UserProfile)
     quantity = models.PositiveIntegerField()
     date = models.DateTimeField(default = timezone.now)
 

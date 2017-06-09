@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm, SellerReviewForm
+from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm, SellerReviewForm, ModifyUserDataForm
 from .models import Category, Product, ProductReview, UserProfile, SellerProfile, Order, SellerReview
 from django.contrib.auth.decorators import login_required
 
@@ -22,9 +22,6 @@ def category(request, category_id):
     products = Product.objects.filter(category=category)
     return render(request, 'decommerce/category.html',
                   context={'actual_category': category, 'categories': categories, 'product_list': products})
-
-def check_user_profile(user):
-    return user.is_authenticated() and UserProfile.objects.filter(user = user).exists()
 
 @login_required
 def add_review(request, product_id):
@@ -144,8 +141,18 @@ def seller_profile(request, user, visitor = False):
     
 @login_required
 def buyer_profile(request, user, visitor = False):
+    categories = Category.objects.all()
     buyer = get_object_or_404(UserProfile, user = user)
-    return HttpResponse("You're " + user.get_username() + " you live in " + buyer.address + ", " + buyer.nationality)
+    orders_made = Order.objects.filter(user = buyer)
+    reviews_made = [review.product for review in ProductReview.objects.filter(by = buyer)]
+    missing_reviews = set()
+    for order in orders_made:
+        if order.product not in reviews_made:
+            missing_reviews.add(order.product)
+    edit_user = ModifyUserDataForm(initial = {'mail':user.email, 'nationality':buyer.nationality, 'address':buyer.address})
+    return render(request, 'decommerce/buyer_profile.html', 
+                  context = {'categories':categories, 'buyer':buyer, 'orders':orders_made, 'missing_reviews':missing_reviews,
+                             'edit_form':edit_user})
        
 @login_required
 def profile(request, user_id):
