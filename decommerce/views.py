@@ -4,9 +4,9 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm, AddCategoryForm
-from .models import Category, Product, ProductReview, UserProfile, SellerProfile, Order
-from django.contrib.auth.decorators import login_required, user_passes_test
+from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm, SellerReviewForm
+from .models import Category, Product, ProductReview, UserProfile, SellerProfile, Order, SellerReview
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -26,28 +26,35 @@ def category(request, category_id):
 def check_user_profile(user):
     return user.is_authenticated() and UserProfile.objects.filter(user = user).exists()
 
+@login_required
+def add_review(request, product_id):
+    user_profile = get_object_or_404(UserProfile, user = request.user)
+    form = ProductReviewForm(request.POST)
+    if form.is_valid():
+        data = form.cleaned_data
+        product_review = ProductReview(product = get_object_or_404(Product, pk = product_id), by = user_profile,
+                                           stars = data['stars'], title = data['title'], review = data['review'])
+        product_review.save()
+    return HttpResponseRedirect('/product/' + str(product_id))
+
 
 def product(request, product_id):
     if request.method == 'POST':
-        if not request.user.is_authenticated():
-            return render(request, 'templates/login.html', context={'next':request.path})
-        form = ProductReviewForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            product_review = ProductReview(product = get_object_or_404(Product, pk = product_id), by = request.user,
-                                           stars = data['stars'], title = data['title'], review = data['review'])
-            product_review.save()
-            return HttpResponseRedirect('/product/' + str(product_id))
+        return add_review(request, product_id)
     else:
         categories = Category.objects.all()
         product = get_object_or_404(Product, pk=product_id)
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
         review_form = ProductReviewForm()
-        if reviews.filter(by = request.user).exists():
+        if not request.user.is_authenticated():
+            return render(request, 'decommerce/product.html',
+                           context={'actual_category': category, 'categories':categories, 'product': product,
+                                    'review_form':review_form, 'error':'Devi essere registrato per scrivere una recensione'})
+        if reviews.filter(by = UserProfile.objects.get(user = request.user)).exists():
             return render(request, 'decommerce/product.html',
                         context={'actual_category': category, 'categories': categories, 'product': product,
-                                'reviews': reviews, 'review_form': review_form, 'already_written': True})
+                                'reviews': reviews, 'review_form': review_form, 'error': 'Hai già scritto una recensione'})
         else:
             return render(request, 'decommerce/product.html',
                           context={'actual_category': category, 'categories': categories, 'product': product,
@@ -119,29 +126,37 @@ def register(request):
         return render(request, 'decommerce/register.html', context={'form':register_form, 'categories':categories})
 
 @login_required
-def seller_profile(request, user):
+def seller_profile(request, user, visitor = False):
     seller = SellerProfile.objects.get(user = user)
     products = Product.objects.filter(seller = seller)
+    seller_reviews = SellerReview.objects.filter(seller = seller)
+    categories = Category.objects.all()
     upload_product_form = UploadProductForm()
-    add_category_form = AddCategoryForm()
-    return render(request, 'decommerce/seller_profile.html',
-            context={'seller':seller, 'categories':Category.objects.all(), 'products':products,
-                     'product_form':upload_product_form, 'category_form':add_category_form})
+    seller_review_form = SellerReviewForm()
+    if visitor:
+        return render(request, 'decommerce/seller_profile_visitor.html',
+                      context={'seller':seller, 'categories':categories, 'products':products,
+                               'review_form':seller_review_form, 'seller_reviews': seller_reviews})
+    else:
+        return render(request, 'decommerce/seller_profile.html',
+                context={'seller':seller, 'categories':categories, 'products':products,
+                        'product_form':upload_product_form, 'seller_reviews':seller_reviews})
     
 @login_required
-def buyer_profile(request, user):
+def buyer_profile(request, user, visitor = False):
     buyer = get_object_or_404(UserProfile, user = user)
     return HttpResponse("You're " + user.get_username() + " you live in " + buyer.address + ", " + buyer.nationality)
        
 @login_required
 def profile(request, user_id):
-    if str(request.user.id) != user_id:
-        return HttpResponse('You\'re not the selected user')
     user = get_object_or_404(User, pk = user_id)
+    visitor = False
+    if str(request.user.id) != user_id:
+        visitor = True
     if UserProfile.objects.filter(user = user).exists():
-        return buyer_profile(request, user)
+        return buyer_profile(request, user, visitor)
     elif SellerProfile.objects.filter(user = user).exists():
-        return seller_profile(request, user)
+        return seller_profile(request, user, visitor)
     else:
         return HttpResponse('You\'re user: ' + user.get_username())
 
@@ -162,18 +177,6 @@ def add_product(request, user_id):
         return HttpResponseRedirect('/')
 
 @login_required
-def add_category(request):
-    if request.method == 'POST':
-        form = AddCategoryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/')
-        else:
-            return HttpResponse(str(form.errors))
-    else:
-        return render(request, )
-
-@login_required
 def remove_product(request, product_id):
     product = get_object_or_404(Product, pk = product_id)
     if SellerProfile.objects.get(user = request.user) == product.seller:
@@ -187,8 +190,9 @@ def product_details(request, product_id):
     nations = UserProfile._meta.get_field('nationality').choices
     nations_values = [i[0] for i in nations]
     nations_orders = dict.fromkeys(nations_values, 0)
-    for nation in [order.user.nationality for order in orders]:
-        nations_orders[nation] = nations_orders[nation] + 1
+    for order in orders:
+        nation = order.user.nationality
+        nations_orders[nation] = nations_orders[nation] + order.quantity
     if request.method == 'POST':
         amount = int(request.POST['stock'])
         print('Increase by', amount)
@@ -200,16 +204,3 @@ def product_details(request, product_id):
                           context={'product':product, 'orders':orders, 'error_message':'Il numero di oggetti deve essere positivo', 'nation_orders':nations_orders})
     else:
         return render(request, 'decommerce/product_details.html', context={'product':product, 'orders':orders, 'nation_orders':nations_orders})
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

@@ -23,7 +23,17 @@
                             <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
                                     class="fa fa-info"></i> Dettagli</a>
                         </div>
-                        <p>{{ product.name }}<br><b>{{ product.price }} Euro</b></p>
+                        <p>{{ product.name }}<br><b>{{ product.price }} Euro</b><br>
+                            {% with ''|center:5 as range %}
+                                    {% for i in range %}
+                                        {% if forloop.counter <= product.stars_avg %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                            {% endwith %}
+                        </p>
                     </div>
                 </div>
             </div>

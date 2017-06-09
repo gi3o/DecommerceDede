@@ -39,6 +39,17 @@ class SellerProfile(models.Model):
     def __str__(self):
         return self.store_name
 
+    def calculateAverageVotes(self):
+        reviews = SellerReview.objects.filter(seller= self)
+        if not reviews.exists():
+            return -1
+        sum = 0
+        for rev in reviews:
+            sum += rev.stars
+        return sum/reviews.count()
+
+    star_avg = property(calculateAverageVotes)
+
     class Meta:
         verbose_name = _('seller profile')
 
@@ -47,11 +58,11 @@ def content_file_name(instance, filename):
 
 class Product(models.Model):
     name = models.CharField(max_length=100, blank= False)
-    category = models.ForeignKey(Category, blank= False)
+    category = models.ForeignKey(Category, blank= False, on_delete= models.CASCADE)
     details = models.TextField()
     price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank= False)
     image = models.ImageField(blank= False, upload_to=content_file_name)
-    seller = models.ForeignKey(SellerProfile, blank= False)
+    seller = models.ForeignKey(SellerProfile, blank= False, on_delete= models.CASCADE)
     stock = models.PositiveIntegerField()
     added = models.DateTimeField(default= timezone.now)
 
@@ -71,6 +82,17 @@ class Product(models.Model):
         self.stock += quantity
         self.save()
 
+    def calculateAverageVotes(self):
+        reviews = ProductReview.objects.filter(product = self)
+        if not reviews.exists():
+            return -1
+        sum = 0
+        for rev in reviews:
+            sum += rev.stars
+        return sum/reviews.count()
+
+    stars_avg = property(calculateAverageVotes)
+
     class Meta:
         verbose_name = _('product')
         
@@ -81,35 +103,38 @@ STAR_CHOICES=[(1, '1'),
          (5, '5')]
 
 class SellerReview(models.Model):
-    seller = models.ForeignKey(SellerProfile)
-    by = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    seller = models.ForeignKey(SellerProfile, on_delete= models.CASCADE)
+    by = models.OneToOneField(UserProfile, null= True, on_delete= models.SET_NULL)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices = STAR_CHOICES)
+    title = models.CharField(max_length= 30, blank= False)
     review = models.TextField()
+    date = models.DateTimeField(default= timezone.now)
 
     def __str__(self):
-        return self.seller.store_name + ", " + self.by.user.get_username() + ", " + str(self.stars) + " stars"
+        return self.seller.store_name + ", " + str(self.by) + ", " + str(self.stars) + " stars"
 
     class Meta:
         verbose_name = _('seller review')
 
 class Order(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete= models.CASCADE)
     user= models.ForeignKey(UserProfile)
     quantity = models.PositiveIntegerField()
     date = models.DateTimeField(default = timezone.now)
 
     def __str__(self):
-        return self.product.name + ", " + self.user.user.get_username() + ", " + str(self.quantity)
+        return self.product.name + ", " + str(self.user) + ", " + str(self.quantity)
 
     class Meta:
         verbose_name = _('order')
 
 class ProductReview(models.Model):
-    product = models.ForeignKey(Product)
-    by = models.OneToOneField(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete= models.CASCADE)
+    by = models.OneToOneField(UserProfile, null = True, on_delete= models.SET_NULL)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices = STAR_CHOICES)
     title = models.CharField(max_length= 30, blank= False)
     review = models.CharField(max_length= 280)
+    date = models.DateTimeField(default= timezone.now)
 
     def __str__(self):
         return self.product.name + ", " + str(self.stars) + " stars"

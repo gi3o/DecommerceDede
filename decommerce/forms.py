@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm, Select, TextInput, Textarea, IntegerField, NumberInput, FileInput, ModelChoiceField
-from .models import Product, ProductReview, Category, SellerProfile
+from .models import Product, ProductReview, Category, SellerProfile, SellerReview
 
 
 class ProductReviewForm(ModelForm):
@@ -66,12 +66,13 @@ class UploadProductForm(ModelForm):
             'image': FileInput(),
             }
 
-class AddCategoryForm(ModelForm):
+class SellerReviewForm(ModelForm):
     class Meta:
-        model = Category
-        fields = ['name']
+        model = SellerReview
+        fields = ['stars', 'title', 'review']
         widgets = {
-            'name': TextInput(attrs={'class':'w3-input', 'placeholder':'Nome Categoria'}),
+            'stars': Select(attrs={'class':'w3-select w3-input w3-light-gray w3-border-0'}),
+            'title': TextInput(attrs={'class': 'w3-input w3-margin-bottom', 'placeholder': 'Titolo'}),
+            'review': Textarea(attrs={'class': 'w3-input', 'placeholder': 'Recensione'})
         }
-
 

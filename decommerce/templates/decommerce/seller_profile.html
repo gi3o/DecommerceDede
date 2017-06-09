@@ -5,8 +5,25 @@
 {% block title %}{{ seller.store_name }}{% endblock %}
 {% block top_title %}{{ seller.store_name }} - Profilo{% endblock %}
 {% block content %}
-
+    <div class="w3-container{% if seller.star_avg == -1 %}w3-light-gray{% endif %}">Media recensioni:
+        {% with ''|center:5 as range %}
+                    {% for i in range %}
+                        {% if forloop.counter <= seller.star_avg %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+    </div>
     <button onclick="expandModal('addProductDiv')" class="w3-button w3-left-align">Aggiungi un prodotto</button>
+    {% if seller_reviews %}
+        <button onclick="expandModal('sellerReviewsDiv')" class="w3-button w3-left-align">Recensioni del venditore</button>
+    {% else %}
+        <button class="w3-button" disabled title="Nessuna recensione">Recensioni del venditore</button>
+    {% endif %}
+    <button onclick="expand('ProductList')" class="w3-button w3-block w3-left-align">Prodotti del negozio</button>
+
 
     <div id="addProductDiv" class="modal">
         <div class="modal-content">
@@ -61,7 +78,7 @@
         </div>
     </div>
 
-    <button onclick="expand('ProductList')" class="w3-button w3-block w3-left-align">Prodotti del negozio</button>
+
     <!-- Product grid -->
     <div id="ProductList" class="w3-row w3-card w3-grayscale w3-container w3-hide w3-show">
         {% if products %}
@@ -79,7 +96,17 @@
                                     <i class="fa fa-times"></i> Elimina
                                 </a>
                             </div>
-                            <p>{{ product.name }}<br><b>{{ product.price }} Euro</b></p>
+                            <p>{{ product.name }}<br><b>{{ product.price }} Euro</b><br>
+                                {% with ''|center:5 as range %}
+                                    {% for i in range %}
+                                        {% if forloop.counter <= product.stars_avg %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -87,6 +114,33 @@
         {% else %}
             <p>Non ci sono prodotti da mostrare</p>
         {% endif %}
+    </div>
+
+    <div id="sellerReviewsDiv" class="modal">
+        <div class="modal-content" style="max-height: 600px; overflow-y: auto">
+            <div class="w3-container w3-padding w3-dark-grey">
+                <span class="close" onclick="closeModal('sellerReviewsDiv')">&times;</span>
+                <h2>Recensioni {{ seller }}</h2>
+            </div>
+            {% for review in seller_reviews %}
+                <div class="w3-card w3-row w3-margin">
+                <div class="w3-container w3-gray">{{ review.date }}</div>
+                <div class="w3-col w3-margin-left">
+                    {% with ''|center:5 as range %}
+                    {% for i in range %}
+                        {% if forloop.counter <= review.stars %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+                </div>
+                <div class="w3-col w3-margin-left">Da: {{ review.by }}</div>
+                <div class="w3-col w3-margin-left" style="max-height: 50px; overflow-y: auto">{{ review.review }}</div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
 {% block script %}

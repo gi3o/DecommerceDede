@@ -9,9 +9,18 @@
     <!-- Product informations -->
     <div class="w3-container w3-row">
         <div class="w3-container w3-text-grey w3-col s12 m8 l9">
-            <p>
-            <h3>{{ product.name }}</h3></p>
-            <p>Venduto da: {{ product.seller }}</p>
+            <p><h3>{{ product.name }}</h3></p>
+            <p>{% with ''|center:5 as range %}
+                    {% for i in range %}
+                {% if forloop.counter <= product.stars_avg %}
+                    <i class="fa fa-star"></i>
+                {% else %}
+                    <i class="fa fa-star-o"></i>
+                {% endif %}
+                {% endfor %}
+            {% endwith %}
+            </p>
+            <p>Venduto da: <a href="{% url 'decommerce:profile' product.seller.user.id %}">{{ product.seller }}</a></p>
             <p>Prezzo: {{ product.price }} Euro</p>
             {% if product.stock > 0 %}
                 <p class="w3-text-green">In stock</p>
@@ -29,6 +38,7 @@
         <p>{{ product.details }}</p>
     </div>
 
+    {% if request.user.is_authenticated %}
     <!-- Product reviews -->
     <div class="w3-container w3-card w3-margin">
         {% if reviews %}
@@ -59,6 +69,7 @@
             <h5>Nessuna recensione</h5>
         {% endif %}
     </div>
+    {% endif %}
 
     <!-- Review form -->
     <form class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" method="post">
