@@ -5,7 +5,30 @@
 {% block title %}{{ buyer.user.get_username }}{% endblock %}
 {% block top_title %}{{ buyer.user.get_username }} - Profilo{% endblock %}
 {% block content %}
-    <button onclick="expandModal('modifyDataDiv')" class="w3-button w3-left-align">Modifica i tuoi dati</button>
+
+    {% if errors %}
+        <div class="w3-container">
+            <ul class="w3-ul w3-text-red">
+                <li><h3>Ricontrolla i campi:</h3></li>
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="w3-container">
+        <ul class="w3-ul">
+            <li><h3>Dati dell'utente:</h3></li>
+            <li>Email: {{ buyer.user.email }}</li>
+            <li>Nome: {{ buyer.user.first_name }}</li>
+            <li>Cognome: {{ buyer.user.last_name }}</li>
+            <li>Nazionalit&agrave;: {{ buyer.nationality }}</li>
+            <li>Indirizzo: {{ buyer.address }}</li>
+        </ul>
+        <button onclick="expandModal('modifyDataDiv')" class="w3-button w3-left-align w3-right">Modifica i tuoi dati
+        </button>
+    </div>
 
     <div class="w3-container" style="max-height: 500px; overflow-y: auto">
         <p>Ordini effettuati:</p>
@@ -13,11 +36,17 @@
             <div class="w3-card w3-row w3-margin-bottom">
                 <div class="w3-container w3-gray">{{ order.date }}</div>
                 <div class="w3-col w3-threequarter">
-                    <div class="w3-container"><a href="{% url 'decommerce:product' order.product.id %}">{{ order.product.name }}</a></div>
-                    <div class="w3-container">Da: <a href="{% url 'decommerce:profile' order.product.seller.user.id %}">{{ order.product.seller.store_name }}</a></div>
+                    <div class="w3-container"><a
+                            href="{% url 'decommerce:product' order.product.id %}">{{ order.product.name }}</a></div>
+                    <div class="w3-container">Da: <a
+                            href="{% url 'decommerce:profile' order.product.seller.user.id %}">{{ order.product.seller.store_name }}</a>
+                    </div>
                     <div class="w3-container">Quantit&agrave;: {{ order.quantity }}</div>
-                    {% if order.product in missing_reviews %}
+                    {% if order.product in product_missing_reviews %}
                         <div class="w3-container w3-text-orange">Scrivi una recensione per questo prodotto!</div>
+                    {% endif %}
+                    {% if order.product.seller in seller_missing_reviews %}
+                        <div class="w3-container w3-text-orange">Scrivi una recensione per questo venditore!</div>
                     {% endif %}
                 </div>
                 <div class="w3-col w3-right" style="max-height: 150px; max-width: 150px">
@@ -26,19 +55,49 @@
             </div>
         {% endfor %}
     </div>
-    
+
     <div id="modifyDataDiv" class="modal">
         <div class="modal-content">
-                <div class="w3-container w3-padding w3-dark-grey">
-                    <span class="close" onclick="closeModal('modifyDataDiv')">&times;</span>
-                    <h2>Modifica i tuoi dati</h2>
-                </div>
+            <div class="w3-container w3-padding w3-dark-grey">
+                <span class="close" onclick="closeModal('modifyDataDiv')">&times;</span>
+                <h2>Modifica i tuoi dati</h2>
+            </div>
+            <form method="post">
+                {% csrf_token %}
                 <div class="w3-padding">
-                    {{ edit_form.as_p }}
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-envelope-o"></i></div>
+                        <div class="w3-rest">
+                            {{ edit_form.mail }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-rest" style="margin-left: 50px">
+                            {{ edit_form.name }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-rest" style="margin-left: 50px">
+                            {{ edit_form.surname }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-flag"></i></div>
+                        <div class="w3-rest">
+                            {{ edit_form.nationality }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-map-marker"></i></div>
+                        <div class="w3-rest">
+                            {{ edit_form.address }}
+                        </div>
+                    </div>
                 </div>
                 <div class="w3-container w3-padding w3-light-grey">
                     <input class="w3-button w3-quarter w3-border-bottom w3-right" type="submit" value="Conferma"/>
                 </div>
-                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}

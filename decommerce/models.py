@@ -14,23 +14,15 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = _('category')
-        
+
 NATION_CHOICES = [('ITA', 'Italia'),
                   ('ENG', 'Ingilterra'),
                   ('USA', 'Stati Uniti'),
                   ('FRA', 'Francia'),
                   ('SPA', 'Spagna')]
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nationality = models.CharField(max_length=3, validators=[MinLengthValidator(3)], choices = NATION_CHOICES)
-    address = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.user.get_username()
-
-    class Meta:
-        verbose_name = _('user profile')
+def content_file_name(instance, filename):
+    return '/'.join(['photos', instance.seller.user.username, get_random_string(length=32)])
 
 class SellerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -52,9 +44,6 @@ class SellerProfile(models.Model):
 
     class Meta:
         verbose_name = _('seller profile')
-
-def content_file_name(instance, filename):
-    return '/'.join(['photos', instance.seller.user.username, get_random_string(length=32)])
 
 class Product(models.Model):
     name = models.CharField(max_length=100, blank= False)
@@ -93,9 +82,33 @@ class Product(models.Model):
 
     stars_avg = property(calculateAverageVotes)
 
+    def productAvailable(self):
+        return self.stock > 0
+
+    product_available = property(productAvailable)
+
     class Meta:
         verbose_name = _('product')
-        
+
+class CartItem(models.Model):
+    product = models.ForeignKey(Product, on_delete= models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nationality = models.CharField(max_length=3, validators=[MinLengthValidator(3)], choices = NATION_CHOICES)
+    address = models.CharField(max_length=50)
+    cart = models.ManyToManyField(CartItem)
+
+    def __str__(self):
+        return self.user.get_username()
+
+    def addtoCart(self, cart_item):
+        self.cart.add(cart_item)
+
+    class Meta:
+        verbose_name = _('user profile')
+
 STAR_CHOICES=[(1, '1'),
          (2, '2'),
          (3, '3'),

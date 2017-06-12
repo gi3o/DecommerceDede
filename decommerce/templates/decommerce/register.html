@@ -6,6 +6,16 @@
 {% block top_title %}Registrati{% endblock %}
 {% block content %}
     <section class="w3-container w3-margin-bottom">
+        {% if errors %}
+            <div class="w3-container">
+                <ul class="w3-ul w3-text-red">
+                    <li><h3>Ricontrolla i campi:</h3></li>
+                    {% for err in errors %}
+                        <li>{{ err }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         {% if registration_error %}
             <h5 class="w3-text-red">{{ registration_error }}</h5>
         {% endif %}
@@ -14,49 +24,48 @@
             <div class="w3-row w3-section">
                 <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-envelope-o"></i></div>
                 <div class="w3-rest">
-                    {{ form.mail }}
+                    {{ register_form.mail }}
                 </div>
             </div>
             <div class="w3-row w3-section">
                 <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-user-o"></i></div>
                 <div class="w3-rest">
-                    {{ form.username }}
+                    {{ register_form.username }}
                 </div>
             </div>
             <div class="w3-row w3-section">
                 <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-key"></i></div>
                 <div class="w3-rest">
-                    {{ form.password }}
+                    {{ register_form.password }}
                 </div>
             </div>
             <div class="w3-row w3-section">
                 <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-check-circle-o"></i></div>
                 <div class="w3-rest">
-                    {{ form.type }}
+                    {{ register_form.type }}
                 </div>
             </div>
             <div id="divCompratore" class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin">
                 <div class="w3-row w3-section">
                     <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-flag"></i></div>
                     <div class="w3-rest">
-                        {{ form.nationality }}
+                        {{ register_form.nationality }}
                     </div>
                 </div>
                 <div class="w3-row w3-section">
                     <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-map-marker"></i></div>
                     <div class="w3-rest">
-                        {{ form.address }}
+                        {{ register_form.address }}
                     </div>
                 </div>
             </div>
             <div id="divVenditore" class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" style="display: None">
                 <div class="w3-row w3-section">
-                    {{ form.store_name }}
+                    {{ register_form.store_name }}
                 </div>
             </div>
             <input class="w3-input w3-quarter" type="submit" value="Registrati">
         </form>
-        <p id="test"></p>
     </section>
 {% endblock %}
 {% block script %}

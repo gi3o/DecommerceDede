@@ -5,8 +5,12 @@
 {% block title %}{{ product.name }}{% endblock %}
 {% block top_title %}{{ product.name }} - Dettagli{% endblock %}
 {% block content %}
-    {% if error_message %}
-            <p class="w3-container w3-text-red">{{ error_message }}</p>
+    {% if errors %}
+        <ul class="w3-ul w3-text-red">
+        {% for err in errors %}
+            <li>{{ err }}</li>
+        {% endfor %}
+        </ul>
     {% endif %}
     <div class="w3-container w3-row">
         {% if product.stock > 20 %}
@@ -23,7 +27,7 @@
     <div id="addStockDiv" class="w3-row w3-card w3-grayscale w3-container w3-hide w3-margin">
         <form method="post">
             {% csrf_token %}
-            <input class="w3-input w3-quarter w3-border-bottom w3-margin" type="number" name="stock" required id="id_stock" step="1" class="w3-input">
+            <input class="w3-input w3-quarter w3-border-bottom w3-margin" type="number" name="stock" required id="id_stock" step="1" value="0">
             <input class="w3-button w3-quarter w3-margin" type="submit" value="Aggiungi">
         </form>
     </div>

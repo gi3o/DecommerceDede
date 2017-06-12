@@ -8,67 +8,77 @@
 
     <!-- Product informations -->
     <div class="w3-container w3-row">
-        <div class="w3-container w3-text-grey w3-col s12 m8 l9">
-            <p><h3>{{ product.name }}</h3></p>
-            <p>{% with ''|center:5 as range %}
+        <div class="w3-card w3-text-grey w3-col s12 m8 l9">
+            <div class="w3-container w3-grey w3-text-white">
+                <h3 style="margin: 0">{{ product.name }}</h3>
+            </div>
+            <div class="w3-container">
+                <p>{% with ''|center:5 as range %}
                     {% for i in range %}
-                {% if forloop.counter <= product.stars_avg %}
-                    <i class="fa fa-star"></i>
+                        {% if forloop.counter <= product.stars_avg %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}
+                </p>
+                <p>Venduto da: <a href="{% url 'decommerce:profile' product.seller.user.id %}">{{ product.seller }}</a>
+                </p>
+                <p>Prezzo: {{ product.price }} Euro</p>
+                {% if product.stock > 0 %}
+                    <p class="w3-text-green">In stock</p>
                 {% else %}
-                    <i class="fa fa-star-o"></i>
+                    <p class="w3-text-red">Terminato</p>
                 {% endif %}
-                {% endfor %}
-            {% endwith %}
-            </p>
-            <p>Venduto da: <a href="{% url 'decommerce:profile' product.seller.user.id %}">{{ product.seller }}</a></p>
-            <p>Prezzo: {{ product.price }} Euro</p>
-            {% if product.stock > 0 %}
-                <p class="w3-text-green">In stock</p>
-            {% else %}
-                <p class="w3-text-red">Terminato</p>
+                Descrizione:
+                <p class="w3-border w3-container">{{ product.details }}</p>
+            </div>
+        </div>
+        <div class="w3-container w3-center w3-third w3-padding-32 w3-col s12 m4 l3">
+            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%;">
+            {% if product_available and request.user.is_authenticated %}
+                <form method="post">
+                    <input class="w3-input" type="number" name="stock" oninput="checkPositive(this.value)"
+                           required id="id_number" step="1" value="1">
+
+                </form>
+                <button class="w3-btn w3-black w3-text-white w3-margin-top">Aggiungi al carrello</button>
             {% endif %}
         </div>
-        <div class="w3-container w3-third w3-padding-32 w3-col s12 m4 l3">
-            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%;">
-        </div>
-    </div>
-
-    <!-- Product details -->
-    <div class="w3-container">
-        <p>{{ product.details }}</p>
     </div>
 
     {% if request.user.is_authenticated %}
-    <!-- Product reviews -->
-    <div class="w3-container w3-card w3-margin">
-        {% if reviews %}
-            <h5>Recensioni</h5>
-            <div class="w3-container" style="max-height: 300px; overflow-y: auto">
-                {% for review in reviews %}
-                    <div class="w3-section w3-row w3-margin-bottom w3-border-bottom">
-                        <div class="w3-container w3-row w3-text-black"><b>{{ review.title }}</b></div>
-                        <div class="w3-container w3-row w3-text-grey">By: {{ review.by }}</div>
-                        <div class="w3-container w3-row">
-                            {% with ''|center:5 as range %}
-                                {% for i in range %}
-                                    {% if forloop.counter <= review.stars %}
-                                        <i class="fa fa-star"></i>
-                                    {% else %}
-                                        <i class="fa fa-star-o"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endwith %}
+        <!-- Product reviews -->
+        <div class="w3-container w3-card w3-margin">
+            {% if reviews %}
+                <h5>Recensioni</h5>
+                <div class="w3-container" style="max-height: 300px; overflow-y: auto">
+                    {% for review in reviews %}
+                        <div class="w3-section w3-row w3-margin-bottom w3-border-bottom">
+                            <div class="w3-container w3-row w3-text-black"><b>{{ review.title }}</b></div>
+                            <div class="w3-container w3-row w3-text-grey">By: {{ review.by }}</div>
+                            <div class="w3-container w3-row">
+                                {% with ''|center:5 as range %}
+                                    {% for i in range %}
+                                        {% if forloop.counter <= review.stars %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <div class="w3-container w3-text-black">
+                                {{ review.review }}
+                            </div>
                         </div>
-                        <div class="w3-container w3-text-black">
-                            {{ review.review }}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <h5>Nessuna recensione</h5>
-        {% endif %}
-    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h5>Nessuna recensione</h5>
+            {% endif %}
+        </div>
     {% endif %}
 
     <!-- Review form -->
@@ -79,12 +89,15 @@
             {% else %}
                 Scrivi per primo una recensione di questo prodotto:
             {% endif %}
-            {% if error %}
-                <h6 class="w3-text-red">{{ error }}</h6>
+            {% if errors %}
+                {% for err in errors %}
+                    <h6 class="w3-text-red">{{ err }}</h6>
+                {% endfor %}
             {% endif %}
         </h5>
         {% csrf_token %}
-        {% if error %}<fieldset disabled="disabled">{% endif %}
+        {% if errors %}
+            <fieldset disabled="disabled">{% endif %}
         <div class="w3-row w3-section">
             <div class="w3-col" style="width: 50px;"><i class="w3-xxlarge fa fa-star-o"></i></div>
             <div class="w3-rest">
@@ -103,7 +116,18 @@
                 {{ review_form.review }}
             </div>
         </div>
-        <input class="w3-button w3-block w3-section w3-border w3-border-black w3-ripple w3-padding" type="submit" value="Invia" />
-        {% if error %}</fieldset>{% endif %}
+        <input class="w3-button w3-block w3-section w3-border w3-border-black w3-ripple w3-padding" type="submit"
+               value="Invia"/>
+        {% if errors %}</fieldset>{% endif %}
     </form>
+{% endblock %}
+{% block script %}
+
+    function checkPositive(val) {
+        var numberSpinner = document.getElementById('id_number');
+        if (parseInt(val) < 1)
+            numberSpinner.value = "1";
+        if (parseInt(val) > {{ product.stock }})
+            numberSpinner.value = "{{ product.stock }}";
+    }
 {% endblock %}

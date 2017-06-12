@@ -85,4 +85,11 @@ class ModifyUserDataForm(forms.Form):
     address = forms.CharField(max_length = 60, label='Indirizzo', widget= forms.TextInput(
                                 attrs={'class':'w3-select w3-input w3-margin-bottom w3-third', 'placeholder':'Indirizzo'}),
                                 required = False)
+    name = forms.CharField(max_length = 30, widget= forms.TextInput(
+                            attrs={'class':'w3-select w3-input w3-margin-bottom w3-third', 'placeholder':'Nome'}),
+                           required= False)
+
+    surname = forms.CharField(max_length = 30, widget= forms.TextInput(
+                            attrs={'class':'w3-select w3-input w3-margin-bottom w3-third', 'placeholder':'Cognome'}),
+                           required= False)
     

@@ -33,13 +33,13 @@
         <a href="{% url 'decommerce:index' %}" title="DECOMMERCE | Home" style="text-decoration: none"><h3 class="w3-wide"><b>DECOMMERCE</b></h3>
         </a>
     </div>
-        <form id="searchForm" class="w3-padding-64 w3-large" action="{% url 'decommerce:search' %}" method="post">
+        <form id="searchForm" class="w3-large w3-margin-bottom" action="{% url 'decommerce:search' %}" method="post">
         {% csrf_token %}
         <input id="searchField" class="w3-container w3-input w3-margin-left w3-animate-input" name="search" type="search" placeholder="Cerca..."
                style="font-family: Roboto, sans-serif; width: 50%; max-width: 80%">
     </form>
     {% block sidebar %}{% endblock %}
-    <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+    <div class="w3-large w3-text-grey" style="font-weight:bold">
         {% for category in categories %}
             {% if category.id == actual_category.id %}
                 <a href="{% url 'decommerce:category' category.id %}" title="{{ category.name }}"
@@ -99,8 +99,6 @@
         </a>
     </div>
 </div>
-
-
 <script type="text/javascript">
     //Script to open and close sidebar
     function w3_open() {
@@ -120,7 +118,7 @@
             searchField.value = query.substring(0, query.length - 1);
         }
     }, false);
-    
+
     function expand(id) {
         var x = document.getElementById(id);
         if (x.className.indexOf("w3-show") == -1) {
