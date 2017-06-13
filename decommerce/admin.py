@@ -38,7 +38,7 @@ admin.site.register(Product, ProductAdmin)
 
 class UserProfileAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('Info', {'fields':['user', 'nationality', 'address']})
+        ('Info', {'fields':['user', 'nationality', 'address', 'cart']})
     ]
     list_display = ['user', 'nationality', 'address']
     list_filter = ['nationality']
@@ -90,3 +90,5 @@ class ProductReviewAdmin(admin.ModelAdmin):
     search_fields = ['by', 'product']
 
 admin.site.register(ProductReview, ProductReviewAdmin)
+
+admin.site.register(CartItem)

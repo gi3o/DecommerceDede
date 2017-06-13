@@ -35,6 +35,8 @@ urlpatterns = [
     url(r'^remove_product/(?P<product_id>[0-9]+)/$', views.remove_product, name='remove_product'),
     # ex: /product_details/32
     url(r'^product_details/(?P<product_id>[0-9]+)/$', views.product_details, name='product_details'),
+    # ex: /add_review/44
+    url(r'^add_review/(?P<product_id>[0-9]+)/$', views.add_review, name='add_review'),
     # ex: /logout/
     url(r'^logout/$', views.logout_view, name='logout'),
     # used to handle login

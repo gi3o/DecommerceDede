@@ -4,26 +4,23 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from decommerce.forms import ProductReviewForm, LoginForm, RegisterForm, UploadProductForm, SellerReviewForm, \
-    ModifyUserDataForm
-from .models import Category, Product, ProductReview, UserProfile, SellerProfile, Order, SellerReview
+from decommerce.forms import *
+from .models import *
 from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 def index(request):
-    categories = Category.objects.all()
     product_list_ord = Product.objects.order_by('-added')[:10]
     return render(request, 'decommerce/index.html',
-                  context={'categories': categories, 'product_list': product_list_ord})
+                  context={'product_list': product_list_ord})
 
 
 def category(request, category_id):
-    categories = Category.objects.all()
     category = get_object_or_404(Category, pk=category_id)
     products = Product.objects.filter(category=category)
     return render(request, 'decommerce/category.html',
-                  context={'actual_category': category, 'categories': categories, 'product_list': products})
+                  context={'actual_category': category, 'product_list': products})
 
 
 @login_required
@@ -39,42 +36,44 @@ def add_review(request, product_id):
 
 
 def product(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
-        return add_review(request, product_id)
+        quantity = int(request.POST['stock'])
+        buyer = UserProfile.objects.get(user = request.user)
+        product.decrease_stock(quantity)
+        product.save()
+        buyer.cart.create(product = product, quantity = quantity)
+        return HttpResponseRedirect('/product/' + product_id)
     else:
-        categories = Category.objects.all()
-        product = get_object_or_404(Product, pk=product_id)
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
         review_form = ProductReviewForm()
-        context = {'actual_category': category, 'categories': categories, 'product': product,
+        context = {'actual_category': category, 'product': product,
                    'review_form': review_form,
                    'product_available': product.product_available}
         if not request.user.is_authenticated():
             context.update({'errors': ['Devi essere loggato per scrivere una recensione']})
         elif reviews.filter(by=UserProfile.objects.get(user=request.user)).exists():
-            context.update({'errors': ['Hai già scritto una recensione']})
+            context.update({'reviews': reviews, 'errors': ['Hai già scritto una recensione']})
         else:
             context.update({'reviews': reviews})
         return render(request, 'decommerce/product.html', context)
 
 
 def search(request):
-    categories = Category.objects.all()
     if request.method == 'POST':
         query = request.POST['search']
         query_set = Product.objects.filter(
             Q(name__contains=query) | Q(details__contains=query) | Q(seller__store_name__contains=query))
         return render(request, 'decommerce/search.html',
-                      context={'categories': categories, 'query': query, 'product_list': query_set})
+                      context={'query': query, 'product_list': query_set})
     else:
-        return render(request, 'decommerce/search_form.html', context={'categories': categories})
+        return render(request, 'decommerce/search_form.html')
 
 
 def login_view(request):
-    categories = Category.objects.all()
     login_form = LoginForm()
-    context = {'categories': categories, 'login_form': login_form}
+    context = {'login_form': login_form}
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
         if login_form.is_valid():
@@ -99,9 +98,8 @@ def logout_view(request):
 
 
 def register(request):
-    categories = Category.objects.all()
     register_form = RegisterForm()
-    context = {'categories': categories, 'register_form': register_form}
+    context = {'register_form': register_form}
     if request.method == 'POST':
         register_form = RegisterForm(request.POST)
         context.update({'register_form': register_form})
@@ -136,10 +134,9 @@ def seller_profile(request, user, visitor=False):
     seller = SellerProfile.objects.get(user=user)
     products = Product.objects.filter(seller=seller)
     seller_reviews = SellerReview.objects.filter(seller=seller)
-    categories = Category.objects.all()
     upload_product_form = UploadProductForm()
     seller_review_form = SellerReviewForm()
-    context = {'seller': seller, 'categories': categories, 'products': products, 'seller_reviews': seller_reviews}
+    context = {'seller': seller, 'products': products, 'seller_reviews': seller_reviews}
     template = 'decommerce/seller_profile.html'
     if visitor:
         context.update({'review_form': seller_review_form})
@@ -152,7 +149,6 @@ def seller_profile(request, user, visitor=False):
 @login_required
 def buyer_profile(request, user, visitor=False):
     buyer = get_object_or_404(UserProfile, user=user)
-    categories = Category.objects.all()
     buyer = get_object_or_404(UserProfile, user=user)
     orders_made = Order.objects.filter(user=buyer)
     edit_user = ModifyUserDataForm(
@@ -167,7 +163,7 @@ def buyer_profile(request, user, visitor=False):
             product_missing_reviews.add(order.product)
         if order.product.seller not in seller_reviews_made:
             seller_missing_reviews.add(order.product.seller)
-    context = {'categories': categories, 'buyer': buyer, 'orders': orders_made, 'edit_form': edit_user,
+    context = {'buyer': buyer, 'orders': orders_made, 'edit_form': edit_user,
                'product_missing_reviews': product_missing_reviews, 'seller_missing_reviews': seller_missing_reviews}
     if request.method == "POST":
         edit_user = ModifyUserDataForm(request.POST)

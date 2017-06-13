@@ -16,7 +16,7 @@ class Category(models.Model):
         verbose_name = _('category')
 
 NATION_CHOICES = [('ITA', 'Italia'),
-                  ('ENG', 'Ingilterra'),
+                  ('ENG', 'Inghilterra'),
                   ('USA', 'Stati Uniti'),
                   ('FRA', 'Francia'),
                   ('SPA', 'Spagna')]
@@ -102,9 +102,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.get_username()
-
-    def addtoCart(self, cart_item):
-        self.cart.add(cart_item)
+        
+    def cartTotal(self):
+        sum = 0
+        for item in self.cart.all():
+            sum += item.product.price * item.quantity
+        return sum
+        
+    cart_total = property(cartTotal)
 
     class Meta:
         verbose_name = _('user profile')
