@@ -5,20 +5,21 @@
 {% block title %}{{ seller.store_name }}{% endblock %}
 {% block top_title %}{{ seller.store_name }} - Profilo{% endblock %}
 {% block content %}
-    <div class="w3-container{% if seller.star_avg == -1 %}w3-light-gray{% endif %}">Media recensioni:
+    <div class="w3-container">Media recensioni:
         {% with ''|center:5 as range %}
-                    {% for i in range %}
-                        {% if forloop.counter <= seller.star_avg %}
-                            <i class="fa fa-star"></i>
-                        {% else %}
-                            <i class="fa fa-star-o"></i>
-                        {% endif %}
-                    {% endfor %}
-                {% endwith %}
+            {% for i in range %}
+                {% if forloop.counter <= seller.star_avg %}
+                    <i class="fa fa-star"></i>
+                {% else %}
+                    <i class="fa fa-star-o"></i>
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
     </div>
     <button onclick="expandModal('addProductDiv')" class="w3-button w3-left-align">Aggiungi un prodotto</button>
     {% if seller_reviews %}
-        <button onclick="expandModal('sellerReviewsDiv')" class="w3-button w3-left-align">Recensioni del venditore</button>
+        <button onclick="expandModal('sellerReviewsDiv')" class="w3-button w3-left-align">Recensioni del venditore
+        </button>
     {% else %}
         <button class="w3-button" disabled title="Nessuna recensione">Recensioni del venditore</button>
     {% endif %}
@@ -53,21 +54,27 @@
                         </div>
                     </div>
                     <div class="w3-row w3-section">
-                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-eur"></i></div>
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-eur" title="Prezzo"></i></div>
                         <div class="w3-rest w3-third">
                             {{ product_form.price }}
                         </div>
                     </div>
                     <div class="w3-row w3-section">
-                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-file-image-o"></i></div>
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-file-image-o" title="Immagine"></i></div>
                         <div class="w3-rest w3-third">
                             {{ product_form.image }}
                         </div>
                     </div>
                     <div class="w3-row w3-section">
-                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-th"></i></div>
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-th" title="Stock"></i></div>
                         <div class="w3-rest w3-third">
                             {{ product_form.stock }}
+                        </div>
+                    </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col" style="width: 50px"><i class="w3-xxlarge fa fa-tags" title="Tags"></i></div>
+                        <div class="w3-rest w3-threequarter">
+                            {{ product_form.tags }}
                         </div>
                     </div>
                 </div>
@@ -80,23 +87,26 @@
 
 
     <!-- Product grid -->
-    <div id="ProductList" class="w3-row w3-card w3-grayscale w3-container w3-hide w3-show">
+    <div id="ProductList" class="w3-row w3-card w3-container w3-hide w3-show">
         {% if products %}
             <p>I tuoi prodotti</p>
             {% for product in products %}
-                <div class="w3-col l3 s6">
+                <div class="w3-col l3 s6" style="height: 350px;">
                     <div class="w3-container">
                         <div class="w3-display-container">
-                            <img src="{{ product.image.url }}" style="width: 100%">
+                            <div class="w3-center w3-margin-top">
+                                <img src="{{ product.image.url }}" style="max-width: 200px; max-height: 200px;">
+                            </div>
                             <div class="w3-display-middle w3-display-hover w3-center">
-                                <a class="w3-btn w3-black" href="javascript:Popup('{% url 'decommerce:product_details' product.id %}')">
+                                <a class="w3-btn w3-black"
+                                   href="javascript:Popup('{% url 'decommerce:product_details' product.id %}')">
                                     <i class="fa fa-bar-chart"></i> Statistiche
                                 </a>
                                 <a class="w3-btn w3-black" href="{% url 'decommerce:remove_product' product.id %}">
                                     <i class="fa fa-times"></i> Elimina
                                 </a>
                             </div>
-                            <p>{{ product.name }}<br><b>{{ product.price }} Euro</b><br>
+                            <p>{{ product.name|truncatechars:65 }}<br><b>{{ product.price }} Euro</b><br>
                                 {% with ''|center:5 as range %}
                                     {% for i in range %}
                                         {% if forloop.counter <= product.stars_avg %}
@@ -124,31 +134,32 @@
             </div>
             {% for review in seller_reviews %}
                 <div class="w3-card w3-row w3-margin">
-                <div class="w3-container w3-gray">{{ review.date }}</div>
-                <div class="w3-col w3-margin-left">
-                    {% with ''|center:5 as range %}
-                    {% for i in range %}
-                        {% if forloop.counter <= review.stars %}
-                            <i class="fa fa-star"></i>
-                        {% else %}
-                            <i class="fa fa-star-o"></i>
-                        {% endif %}
-                    {% endfor %}
-                {% endwith %}
+                    <div class="w3-container w3-gray">{{ review.date }}</div>
+                    <div class="w3-col w3-margin-left">
+                        {% with ''|center:5 as range %}
+                            {% for i in range %}
+                                {% if forloop.counter <= review.stars %}
+                                    <i class="fa fa-star"></i>
+                                {% else %}
+                                    <i class="fa fa-star-o"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="w3-col w3-margin-left">Da: {{ review.by }}</div>
+                    <div class="w3-col w3-margin-left"
+                         style="max-height: 50px; overflow-y: auto">{{ review.review }}</div>
                 </div>
-                <div class="w3-col w3-margin-left">Da: {{ review.by }}</div>
-                <div class="w3-col w3-margin-left" style="max-height: 50px; overflow-y: auto">{{ review.review }}</div>
-            </div>
             {% endfor %}
         </div>
     </div>
 {% endblock %}
 {% block script %}
     function Popup(page) {
-        window.open(page, "", style);
+    window.open(page, "", style);
     }
 
 {% endblock %}
 {% block style %}
-   
+
 {% endblock %}

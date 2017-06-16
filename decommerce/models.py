@@ -45,6 +45,12 @@ class SellerProfile(models.Model):
     class Meta:
         verbose_name = _('seller profile')
 
+class Tags(models.Model):
+    tag = models.CharField(max_length= 30, unique= True)
+
+    def __str__(self):
+        return self.tag
+
 class Product(models.Model):
     name = models.CharField(max_length=100, blank= False)
     category = models.ForeignKey(Category, blank= False, on_delete= models.CASCADE)
@@ -54,6 +60,7 @@ class Product(models.Model):
     seller = models.ForeignKey(SellerProfile, blank= False, on_delete= models.CASCADE)
     stock = models.PositiveIntegerField()
     added = models.DateTimeField(default= timezone.now)
+    tags = models.ManyToManyField(Tags, blank= True)
 
     def __str__(self):
         return self.name + ", " + self.seller.store_name
@@ -64,8 +71,11 @@ class Product(models.Model):
         storage.delete(path)
 
     def decrease_stock(self, quantity):
-        if quantity < self.stock:
+        if quantity <= self.stock:
+            print('Old stock: ', self.stock)
             self.stock -= quantity
+            print('New stock: ', self.stock)
+        self.save()
 
     def increase_stock(self, quantity):
         self.stock += quantity

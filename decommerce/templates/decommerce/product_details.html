@@ -13,7 +13,7 @@
         </ul>
     {% endif %}
     <div class="w3-container w3-row">
-        {% if product.stock > 20 %}
+        {% if product.stock >= 20 %}
             <p class="w3-text-green w3-col">Stock: {{ product.stock }} pezzi</p>
         {% elif product.stock < 20 and product.stock > 0 %}
             <p class="w3-text-orange w3-col">Stock: {{ product.stock }} pezzi</p>
@@ -50,16 +50,17 @@
     
 {% endblock %}
 {% block script %}
-    var topMenu = document.getElementById('topMenu');
+    var rightButtons = document.getElementById('rightButtons');
     var mySidebar = document.getElementById('mySidebar');
     var contentDiv = document.getElementById('contentDiv');
+    var topMenu = document.getElementById('topMenu');
     var hideLargeDiv = document.getElementById('hideLargeDiv');
-    var iconParagraph = document.getElementById('iconParagraph');
+    rightButtons.style.display = 'none';
     mySidebar.style.width = 0;
     contentDiv.style.marginLeft = 0;
-    hideLargeDiv.style.display = 'none';
-    iconParagraph.style.display = 'none';
     topMenu.style.display = 'none';
+    hideLargeDiv.style.display = 'none';
+
     
     function expand(id) {
         var x = document.getElementById(id);

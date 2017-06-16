@@ -30,6 +30,23 @@
         </button>
     </div>
 
+    <div class="w3-container">
+        <ul class="w3-ul">
+            <li><h3>Carrello:</h3></li>
+            <form method="post">{% csrf_token %}
+            {% for item in cart %}
+                <li class="w3-padding-16">
+                    <input class="w3-button w3-white w3-xlarge w3-right" type="submit"
+                           formaction="{% url 'decommerce:remove_cart' item.id %}" value="&times;">
+                    <img src="{{ item.product.image.url }}" class="w3-left w3-circle w3-margin-right" style="width: 50px;">
+                    <span class="w3-large">{{ item.product.name }}</span><br>
+                    <span>&times; {{ item.quantity }}</span>
+                </li>
+            {% endfor %}
+            </form>
+        </ul>
+    </div>
+
     <div class="w3-container" style="max-height: 500px; overflow-y: auto">
         <p>Ordini effettuati:</p>
         {% for order in orders %}

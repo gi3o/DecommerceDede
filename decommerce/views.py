@@ -1,17 +1,17 @@
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.models import User
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Q, ManyToManyField
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from decommerce.forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
+from random import random
 
 
 # Create your views here.
 def index(request):
-    product_list_ord = Product.objects.order_by('-added')[:10]
+    product_list_ord = sorted(Product.objects.order_by('-added')[:9], key=lambda x: random())
     return render(request, 'decommerce/index.html',
                   context={'product_list': product_list_ord})
 
@@ -39,24 +39,23 @@ def product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
         quantity = int(request.POST['stock'])
-        buyer = UserProfile.objects.get(user = request.user)
+        buyer = UserProfile.objects.get(user=request.user)
         product.decrease_stock(quantity)
-        product.save()
-        buyer.cart.create(product = product, quantity = quantity)
+        buyer.cart.create(product=product, quantity=quantity)
         return HttpResponseRedirect('/product/' + product_id)
     else:
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
         review_form = ProductReviewForm()
         context = {'actual_category': category, 'product': product,
-                   'review_form': review_form,
-                   'product_available': product.product_available}
-        if not request.user.is_authenticated():
-            context.update({'errors': ['Devi essere loggato per scrivere una recensione']})
-        elif reviews.filter(by=UserProfile.objects.get(user=request.user)).exists():
-            context.update({'reviews': reviews, 'errors': ['Hai già scritto una recensione']})
+                   'review_form': review_form}
+        if not request.user.is_authenticated() or SellerProfile.objects.filter(user=request.user).exists():
+            context.update({'errors': ['Devi essere loggato come compratore per scrivere una recensione']})
+        elif reviews.filter(by=UserProfile.objects.filter(user=request.user)).exists():
+            context.update({'reviews': reviews, 'errors': ['Hai già scritto una recensione'],
+                            'product_available': product.product_available})
         else:
-            context.update({'reviews': reviews})
+            context.update({'reviews': reviews, 'product_available': product.product_available})
         return render(request, 'decommerce/product.html', context)
 
 
@@ -124,8 +123,6 @@ def register(request):
             return HttpResponseRedirect('/')
         else:
             context.update({'errors': register_form.errors})
-    else:
-        register_form = RegisterForm()
     return render(request, 'decommerce/register.html', context)
 
 
@@ -148,7 +145,6 @@ def seller_profile(request, user, visitor=False):
 
 @login_required
 def buyer_profile(request, user, visitor=False):
-    buyer = get_object_or_404(UserProfile, user=user)
     buyer = get_object_or_404(UserProfile, user=user)
     orders_made = Order.objects.filter(user=buyer)
     edit_user = ModifyUserDataForm(
@@ -205,8 +201,17 @@ def add_product(request, user_id):
         form = UploadProductForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
+            tags = list(filter(None, data['tags'].lower().split(", ")))
+            tag_field = ManyToManyField(Tags, blank= True)
+            for tag in tags:
+                if Tags.objects.filter(tag= tag).exists():
+                    tag_field.add(Tags.objects.get(tag = tag))
+                else:
+                    new_tag = Tags(tag= tag)
+                    new_tag.save()
+                    tag_field.add(tag= new_tag)
             product = Product(name=data['name'], category=data['category'], details=data['details'],
-                              price=data['price'], image=data['image'],
+                              price=data['price'], image=data['image'], tags = tag_field,
                               seller=get_object_or_404(SellerProfile, user=request.user), stock=data['stock'])
             product.save()
             return HttpResponseRedirect('/account/' + str(user_id))
@@ -243,3 +248,23 @@ def product_details(request, product_id):
         else:
             context.update({'errors': ['Il numero di oggetti deve essere positivo']})
     return render(request, 'decommerce/product_details.html', context)
+
+
+@login_required
+def remove_cart(request, item_id):
+    if request.method == "POST":
+        item = CartItem.objects.get(id=item_id)
+        item.product.increase_stock(item.quantity)
+        UserProfile.objects.get(user=request.user).cart.get(id=int(item_id)).delete()
+    return HttpResponseRedirect('/account/' + str(request.user.id))
+
+
+@login_required
+def checkout(request):
+    if UserProfile.objects.filter(user=request.user).exists():
+        buyer = UserProfile.objects.get(user=request.user)
+        for item in buyer.cart.all():
+            order = Order(product=item.product, user=buyer, quantity=item.quantity)
+            order.save()
+            item.delete()
+    return HttpResponseRedirect('/account/' + str(request.user.id))

@@ -16,8 +16,8 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'decommerce/base.css' %}">
-    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-32x32.png' %}" sizes="32x32" />
-    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-16x16.png' %}" sizes="16x16" />
+    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-32x32.png' %}" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="{% static 'decommerce/favicon-16x16.png' %}" sizes="16x16"/>
     <style>
         {% block style %}{% endblock %}
     </style>
@@ -30,14 +30,10 @@
 <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width: 250px;" id="mySidebar">
     <div class="w3-container w3-display-container w3-padding-16">
         <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-        <a href="{% url 'decommerce:index' %}" title="DECOMMERCE | Home" style="text-decoration: none"><h3 class="w3-wide"><b>DECOMMERCE</b></h3>
+        <a href="{% url 'decommerce:index' %}" title="DECOMMERCE | Home" style="text-decoration: none"><h3
+                class="w3-wide"><b>DECOMMERCE</b></h3>
         </a>
     </div>
-        <form id="searchForm" class="w3-large w3-margin-bottom" action="{% url 'decommerce:search' %}" method="post">
-        {% csrf_token %}
-        <input id="searchField" class="w3-container w3-input w3-margin-left w3-animate-input" name="search" type="search" placeholder="Cerca..."
-               style="font-family: Roboto, sans-serif; width: 50%; max-width: 80%">
-    </form>
     {% block sidebar %}{% endblock %}
     <div class="w3-large w3-text-grey" style="font-weight:bold">
         {% for category in categories %}
@@ -71,43 +67,57 @@
     <div class="w3-hide-large" id="hideLargeDiv" style="margin-top: 83px"></div>
 
     <!-- Top header -->
-    <header class="w3-container w3-xlarge w3-row">
-        <p class="w3-third">{% block top_title %}{% endblock %}</p>
-        <div class="w3-right w3-margin-top" id="iconParagraph">
-        {% if cart %}
-            <div class="w3-dropdown-click w3-margin-right">
-                <i onclick="dropdownDiv('cart')" class="fa fa-shopping-cart "></i>
-                <div id="cart" class="w3-dropdown-content w3-bar-block w3-card" style="width: 400px; max-height: 400px; overflow-y: auto; right: 0">
+    <header class="w3-bar w3-xlarge">
+        <h2 class="w3-bar-item">{% block top_title %}{% endblock %}</h2>
+        <span id="rightButtons">
+        <a href="{% url 'decommerce:index' %}" class="w3-bar-item w3-right w3-button" title="Home">
+            <i id="homeIcon" class="fa fa-home"></i></a>
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'decommerce:profile' request.user.id %}" class="w3-bar-item w3-right w3-button"
+               title="Profilo"><i id="profileIcon" class="fa fa-user"></i></a>
+            <a href="{% url 'decommerce:logout' %}" class="w3-bar-item w3-right w3-button" title="Logout"><i
+                    id="logoutIcon" class="fa fa-sign-out"></i></a>
+        {% else %}
+            <a href="{% url 'decommerce:register' %}" class="w3-bar-item w3-right w3-button" title="Registrati"><i
+                    id="registerIcon" class="fa fa-user-plus"></i></a>
+            <a href="{% url 'decommerce:login' %}" class="w3-bar-item w3-right w3-button" title="Login"><i
+                    id="loginIcon" class="fa fa-sign-in"></i></a>
+        {% endif %}
+        <div class="w3-dropdown-click w3-right">
+            <button class="w3-button" onclick="expand('cart')"><i class="fa fa-shopping-cart"></i></button>
+            <div id="cart" class="w3-dropdown-content w3-bar-block w3-card" style="z-index: 1000">
+                {% if cart %}
                     {% for item in cart %}
-                       <div class="w3-row">
-                            <div class="w3-threequarter">
+                        <div class="w3-row w3-border-bottom w3-container">
+                            <a class="w3-third w3-col w3-medium" href="{% url 'decommerce:product' item.product.id %}">
                                 {{ item.quantity }} x {{ item.product.name }}
-                            </div>
-                            <div class="w3-col w3-right" style="max-height: 100px; max-width: 100px">
-                                <img src="{{ item.product.image.url }}" style="width: 100%; align: center; valign: center">
-                            </div>
-                       </div>
+                            </a>
+                            <img class="w3-col w3-right w3-circle" src="{{ item.product.image.url }}"
+                                 style="width: 50px">
+                        </div>
                     {% endfor %}
                     <div class="w3-gray w3-text-white">Totale: {{ cart_total }}</div>
-                    <a href="http://google.com">Gestisci carrello</a>
-                </div>
+                    <div class="w3-center w3-container"><a class="w3-button w3-medium"
+                                                           href="{% url 'decommerce:profile' request.user.id %}">Gestisci
+                        Carrello</a></div>
+                    <div class="w3-center w3-container"><a class="w3-button w3-medium"
+                                                           href="{% url 'decommerce:checkout' %}">Completa l'ordine</a>
+                    </div>
+                {% else %}
+                    <h5 class="w3-container">Il tuo carrello &egrave; vuoto</h5>
+                {% endif %}
             </div>
-        {% endif %}
-            <a href="{% url 'decommerce:index' %}" title="Home"><i id="homeIcon" class="fa fa-home w3-margin-right"></i></a>
-            {% if request.user.is_authenticated %}
-                <a href="{% url 'decommerce:profile' request.user.id %}" title="Profilo"><i id="profileIcon" class="fa fa-user w3-margin-right"></i></a>
-                <a href="{% url 'decommerce:logout' %}" title="Logout"><i id="logoutIcon" class="fa fa-sign-out w3-margin-right"></i></a>
-            {% else %}
-                <a href="{% url 'decommerce:register' %}" title="Registrati"><i id="registerIcon" class="fa fa-user-plus w3-margin-right"></i></a>
-                <a href="{% url 'decommerce:login' %}" title="Login"><i id="loginIcon" class="fa fa-sign-in w3-margin-right"></i></a>
-            {% endif %}
         </div>
-
-
+        <form id="searchForm" action="{% url 'decommerce:search' %}" method="post">
+            {% csrf_token %}
+            <input id="searchField" class="w3-bar-item w3-right w3-input" name="search"
+                   type="search" placeholder="Cerca..." required
+                   style="font-family: Roboto, sans-serif">
+        </form>
+        </span>
     </header>
 
     {% block content %}{% endblock %}
-
 
     <div class="w3-black w3-center w3-padding-24">Powered by
         <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">
@@ -148,7 +158,7 @@
 
     function expandModal(id) {
         var modal = document.getElementById(id);
-        if (window.innerWidth > 992 ) {
+        if (window.innerWidth > 992) {
             modal.style.paddingLeft = '25%';
         } else {
             modal.style.paddingLeft = 0;

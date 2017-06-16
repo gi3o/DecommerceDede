@@ -13,17 +13,21 @@
 
     {% block products %}
     <!-- Product grid -->
-    <div class="w3-row w3-grayscale">
+    <div class="w3-row">
         {% for product in product_list %}
-            <div class="w3-col l3 s6">
+            <div class="w3-col l3 s6 w3-card w3-margin" style="height: 350px">
                 <div class="w3-container">
                     <div class="w3-display-container">
-                        <img src="{{ product.image.url }}" style="width: 100%">
+                        <div class="w3-center w3-margin-top">
+                            <img src="{{ product.image.url }}" style="max-width: 200px; max-height: 200px;">
+                        </div>
                         <div class="w3-display-middle w3-display-hover">
                             <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
                                     class="fa fa-info"></i> Dettagli</a>
                         </div>
-                        <p>{{ product.name }}<br><b>{{ product.price }} Euro</b><br>
+                        <p>{{ product.name|truncatechars:65 }}<br>
+                            <b>{{ product.price }} Euro</b>
+                            <br>
                             {% with ''|center:5 as range %}
                                     {% for i in range %}
                                         {% if forloop.counter <= product.stars_avg %}

@@ -4,11 +4,12 @@
     Displays the products inside a category.
 {% endcomment %}
 {% block title %}Risultati Ricerca{% endblock %}
-{% block top_title %}Risultati per {{ query }}{% endblock %}
+{% block top_title %}Risultati ricerca{% endblock %}
 {% block body_title %}
     {% blocktrans count product_list.count as products %}
         {{ products }} risultato
         {% plural %}
         {{ products }} risultati
     {% endblocktrans %}
+    per "{{ query }}"
 {% endblock %}

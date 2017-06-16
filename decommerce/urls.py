@@ -37,6 +37,10 @@ urlpatterns = [
     url(r'^product_details/(?P<product_id>[0-9]+)/$', views.product_details, name='product_details'),
     # ex: /add_review/44
     url(r'^add_review/(?P<product_id>[0-9]+)/$', views.add_review, name='add_review'),
+    # ex: /remove_cart/2
+    url(r'^remove_cart/(?P<item_id>[0-9]+)/$', views.remove_cart, name='remove_cart'),
+    # ex: /checkout/
+    url(r'^checkout/$', views.checkout, name='checkout'),
     # ex: /logout/
     url(r'^logout/$', views.logout_view, name='logout'),
     # used to handle login

@@ -31,12 +31,13 @@
                 {% else %}
                     <p class="w3-text-red">Terminato</p>
                 {% endif %}
-                Descrizione:
-                <p class="w3-border w3-container">{{ product.details }}</p>
+                Descrizione:<br>
+                <textarea class="w3-container w3-text-gray w3-row"
+                          readonly rows="10" cols="50" style="resize: none;" >{{ product.details }}</textarea>
             </div>
         </div>
         <div class="w3-container w3-center w3-third w3-padding-32 w3-col s12 m4 l3">
-            <img src="{{ product.image.url }}" style="max-width: 100%; max-height: 100%;">
+            <img src="{{ product.image.url }}" style="max-width: 200px; max-height: 300px;">
             {% if product_available and request.user.is_authenticated %}
                 <form method="post">
                     {% csrf_token %}
@@ -48,9 +49,9 @@
         </div>
     </div>
 
+    <div class="w3-container w3-card w3-margin">
     {% if request.user.is_authenticated %}
         <!-- Product reviews -->
-        <div class="w3-container w3-card w3-margin">
             {% if reviews %}
                 <h5>Recensioni</h5>
                 <div class="w3-container" style="max-height: 300px; overflow-y: auto">
@@ -78,8 +79,9 @@
             {% else %}
                 <h5>Nessuna recensione</h5>
             {% endif %}
-        </div>
+        {% else %}<h5>Devi essere loggato per leggere le recensioni</h5>
     {% endif %}
+        </div>
 
     <!-- Review form -->
     <form class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" method="post">

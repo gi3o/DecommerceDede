@@ -54,12 +54,17 @@ class RegisterForm(forms.Form):
                                  required= False)
 
 class UploadProductForm(ModelForm):
+    tags = forms.CharField(max_length= 100,
+                           widget= TextInput(attrs= {'class': 'w3-input',
+                                      'placeholder': 'Tags (separa ogni tag con una virgola e uno spazio, es. "musica, cd")',
+                                      'maxlength':'100'}))
+
     class Meta:
         model = Product
         fields = ['name', 'category', 'details', 'price', 'image', 'stock']
         widgets = {
             'name':TextInput(attrs={'class':'w3-input', 'placeholder':'Nome Prodotto'}),
-            'category': Select(choices = Category.objects.all(), attrs={'class':'w3-select w3-input'}),
+            'category': Select(choices = Category.objects.all(), attrs={'class':'w3-select w3-input', 'title': 'Categoria'}),
             'details': Textarea(attrs={'class':'w3-input', 'placeholder':'Dettagli'}),
             'price': NumberInput(attrs={'class':'w3-input'}),
             'stock': NumberInput(attrs={'class':'w3-input'}),
