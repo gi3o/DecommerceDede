@@ -45,7 +45,7 @@ class SellerProfile(models.Model):
     class Meta:
         verbose_name = _('seller profile')
 
-class Tags(models.Model):
+class Tag(models.Model):
     tag = models.CharField(max_length= 30, unique= True)
 
     def __str__(self):
@@ -60,7 +60,7 @@ class Product(models.Model):
     seller = models.ForeignKey(SellerProfile, blank= False, on_delete= models.CASCADE)
     stock = models.PositiveIntegerField()
     added = models.DateTimeField(default= timezone.now)
-    tags = models.ManyToManyField(Tags, blank= True)
+    tags = models.ManyToManyField(Tag, blank= True)
 
     def __str__(self):
         return self.name + ", " + self.seller.store_name
@@ -96,6 +96,12 @@ class Product(models.Model):
         return self.stock > 0
 
     product_available = property(productAvailable)
+
+    def tags_as_string(self):
+        return ", ".join([tag.tag for tag in self.tags.all()])
+
+    tags_as_string = property(tags_as_string)
+
 
     class Meta:
         verbose_name = _('product')

@@ -201,18 +201,18 @@ def add_product(request, user_id):
         form = UploadProductForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
-            tags = list(filter(None, data['tags'].lower().split(", ")))
-            tag_field = ManyToManyField(Tags, blank= True)
-            for tag in tags:
-                if Tags.objects.filter(tag= tag).exists():
-                    tag_field.add(Tags.objects.get(tag = tag))
-                else:
-                    new_tag = Tags(tag= tag)
-                    new_tag.save()
-                    tag_field.add(tag= new_tag)
             product = Product(name=data['name'], category=data['category'], details=data['details'],
-                              price=data['price'], image=data['image'], tags = tag_field,
+                              price=data['price'], image=data['image'],
                               seller=get_object_or_404(SellerProfile, user=request.user), stock=data['stock'])
+            product.save()
+            tags = list(filter(None, data['tags'].lower().split(", ")))
+            for tag in tags:
+                if Tag.objects.filter(tag= tag).exists():
+                    product.tags.add(Tag.objects.get(tag = tag))
+                else:
+                    new_tag = Tag(tag= tag)
+                    new_tag.save()
+                    product.tags.add(new_tag)
             product.save()
             return HttpResponseRedirect('/account/' + str(user_id))
         else:
@@ -227,6 +227,19 @@ def remove_product(request, product_id):
     if SellerProfile.objects.get(user=request.user) == product.seller:
         product.delete()
     return HttpResponseRedirect('/account/' + str(request.user.id))
+
+@login_required
+def edit_tags(request, product_id):
+    if request.method == 'POST':
+        product = Product.objects.get(pk= product_id)
+        tags = list(filter(None, request.POST['tags'].lower().split(", ")))
+        product.tags.clear()
+        for tag in tags:
+            if Tag.objects.filter(tag= tag).exists():
+                product.tags.add(Tag.objects.get(tag= tag))
+            else:
+                product.tags.add(tag= tag)
+    return HttpResponseRedirect('/product_details/' + str(product_id))
 
 
 @login_required

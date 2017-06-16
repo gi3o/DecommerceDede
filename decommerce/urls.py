@@ -39,6 +39,8 @@ urlpatterns = [
     url(r'^add_review/(?P<product_id>[0-9]+)/$', views.add_review, name='add_review'),
     # ex: /remove_cart/2
     url(r'^remove_cart/(?P<item_id>[0-9]+)/$', views.remove_cart, name='remove_cart'),
+    # ex: /edit_tags/13
+    url(r'^edit_tags/(?P<product_id>[0-9]+)/$', views.edit_tags, name='edit_tags'),
     # ex: /checkout/
     url(r'^checkout/$', views.checkout, name='checkout'),
     # ex: /logout/

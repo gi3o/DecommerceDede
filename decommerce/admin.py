@@ -28,7 +28,7 @@ class DecadeBornListFilter(admin.SimpleListFilter):
 class ProductAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Product Info', {'fields':['name', 'price', 'category', 'image']}),
-        ('Details', {'fields':['details', 'seller', 'stock'], 'classes':['collapse']}),
+        ('Details', {'fields':['details', 'seller', 'stock', 'tags'], 'classes':['collapse']}),
     ]
     list_display = ('name', 'category', 'seller', 'price')
     list_filter = [DecadeBornListFilter, 'seller']
