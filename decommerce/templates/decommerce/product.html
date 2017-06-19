@@ -122,6 +122,41 @@
                value="Invia"/>
         {% if errors %}</fieldset>{% endif %}
     </form>
+
+    <div class="w3-content w3-container w3-display-container">
+        <h2>Prodotti correlati:</h2>
+        {% for prod in related_products %}
+            <div class="relatedDivs w3-row w3-col l3 m4 s6 w3-card w3-margin" style="height: 350px">
+                <div class="w3-container">
+                    <div class="w3-display-container">
+                        <div class="w3-center w3-margin-top">
+                            <img src="{{ prod.image.url }}" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <div class="w3-display-middle w3-display-hover">
+                            <a class="w3-btn w3-black" href="{% url 'decommerce:product' prod.id %}"><i
+                                    class="fa fa-info"></i> Dettagli</a>
+                        </div>
+                        <p>{{ prod.name|truncatechars:65 }}<br>
+                            <b>{{ prod.price }} Euro</b>
+                            <br>
+                            {% with ''|center:5 as range %}
+                                    {% for i in range %}
+                                        {% if forloop.counter <= prod.stars_avg %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                            {% endwith %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1)">&#10094;</button>
+        <button class="w3-button w3-black w3-display-right" onclick="plusDivs(1)">&#10095;</button>
+    </div>
+
 {% endblock %}
 {% block script %}
 
@@ -131,5 +166,31 @@
             numberSpinner.value = "1";
         if (parseInt(val) > {{ product.stock }})
             numberSpinner.value = "{{ product.stock }}";
+    }
+
+    var slideIndex = 1;
+    var numProducts = 2;
+    showDivs(slideIndex);
+
+    function plusDivs(n) {
+      showDivs(slideIndex += n);
+    }
+
+    function showDivs(n) {
+      var i;
+      var x = document.getElementsByClassName("relatedDivs");
+      if (n > x.length) {slideIndex = 1}
+      if (n < 1) {slideIndex = x.length}
+      if (x.length < numProducts) {
+        for (i = 0; i < x.length; i++)
+            x[i].style.display = "block";
+      } else {
+        for (i = 0; i < x.length; i++) {
+           x[i].style.display = "none";
+        }
+        for (i = slideIndex - 1; i < slideIndex + numProducts && i < x.length ; i++) {
+            x[i].style.display = "block";
+        }
+      }
     }
 {% endblock %}

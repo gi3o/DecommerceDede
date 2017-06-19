@@ -7,7 +7,7 @@
 {% block content %}
     <form class="w3-padding-64 w3-large" action="{% url 'decommerce:search' %}" method="post">
         {% csrf_token %}
-        <input id="searchFieldBig" class="w3-container w3-input w3-margin-right" name="Search" type="search"
+        <input id="searchFieldBig" class="w3-container w3-input w3-margin-right" name="search" type="search"
                placeholder="Cerca..."
                style="font-family: Roboto, sans-serif;">
     </form>

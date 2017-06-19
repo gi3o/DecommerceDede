@@ -34,7 +34,6 @@ def add_review(request, product_id):
         product_review.save()
     return HttpResponseRedirect('/product/' + str(product_id))
 
-
 def product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
@@ -48,7 +47,7 @@ def product(request, product_id):
         reviews = ProductReview.objects.filter(product=product)
         review_form = ProductReviewForm()
         context = {'actual_category': category, 'product': product,
-                   'review_form': review_form}
+                   'review_form': review_form, 'related_products': product.related_products(5)}
         if not request.user.is_authenticated() or SellerProfile.objects.filter(user=request.user).exists():
             context.update({'errors': ['Devi essere loggato come compratore per scrivere una recensione']})
         elif reviews.filter(by=UserProfile.objects.filter(user=request.user)).exists():
@@ -58,14 +57,24 @@ def product(request, product_id):
             context.update({'reviews': reviews, 'product_available': product.product_available})
         return render(request, 'decommerce/product.html', context)
 
+def search_term(term):
+    query_set = []
+    for prod in Product.objects.filter(
+                Q(name__contains= term) | Q(details__contains= term) | Q(seller__store_name__contains= term)):
+            query_set.append(prod)
+    if Tag.objects.filter(tag= term).exists():
+        tag_term = Tag.objects.get(tag= term)
+        for product in Product.objects.all():
+            if tag_term in product.tags.all():
+                query_set.append(product)
+    return query_set
+
 
 def search(request):
     if request.method == 'POST':
         query = request.POST['search']
-        query_set = Product.objects.filter(
-            Q(name__contains=query) | Q(details__contains=query) | Q(seller__store_name__contains=query))
         return render(request, 'decommerce/search.html',
-                      context={'query': query, 'product_list': query_set})
+                      context={'query': query, 'product_list': search_term(query)})
     else:
         return render(request, 'decommerce/search_form.html')
 
@@ -238,7 +247,7 @@ def edit_tags(request, product_id):
             if Tag.objects.filter(tag= tag).exists():
                 product.tags.add(Tag.objects.get(tag= tag))
             else:
-                product.tags.add(tag= tag)
+                product.tags.create(tag= tag)
     return HttpResponseRedirect('/product_details/' + str(product_id))
 
 

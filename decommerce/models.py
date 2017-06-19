@@ -102,6 +102,15 @@ class Product(models.Model):
 
     tags_as_string = property(tags_as_string)
 
+    def related_products(self, number):
+        product_tags_set = set(self.tags.all())
+        related_products = [prod for prod in Product.objects.filter(category=self.category).exclude(pk= self.id)]
+        #for prod in category_products:
+        #   related_products.append((prod, product_tags_set.intersection(prod.tags.all())))
+            #if len(product_tags_set.intersection(prod.tags.all())) >= 3:
+            #    related_products.append(prod)
+        related_products.sort(key= lambda x: product_tags_set.intersection(x.tags.all()))
+        return related_products[:number]
 
     class Meta:
         verbose_name = _('product')
