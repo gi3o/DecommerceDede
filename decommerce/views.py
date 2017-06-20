@@ -1,6 +1,6 @@
 from django.contrib.auth import logout, authenticate, login
 from django.db import IntegrityError
-from django.db.models import Q, ManyToManyField
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from decommerce.forms import *

@@ -84,7 +84,8 @@
         </div>
 
     <!-- Review form -->
-    <form class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" method="post">
+    <form class="w3-container w3-card-4 w3-light-grey w3-text-black w3-margin" method="post"
+          action="{% url 'decommerce:add_review' product.id %}">
         <h5 class="w3-center">
             {% if reviews %}
                 Scrivi una recensione per questo prodotto:
