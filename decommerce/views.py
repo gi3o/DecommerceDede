@@ -297,3 +297,19 @@ def checkout(request):
             order.save()
             item.delete()
     return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
+    
+    
+@login_required
+def compare_products(request, id_1, id_2):
+    product_1 = get_object_or_404(Product, pk=id_1)
+    product_2 = get_object_or_404(Product, pk=id_2)
+    context = {'product_1':product_1, 'product_2':product_2}
+    return render(request, 'decommerce/compare_products.html', context)
+    
+    
+    
+    
+    
+    
+    
+    

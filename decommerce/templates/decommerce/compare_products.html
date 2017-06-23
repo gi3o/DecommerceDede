@@ -1,0 +1,86 @@
+{% extends 'decommerce/base.html' %}
+{% comment %}
+    Template used to compare two products: product_1 and product_2
+{% endcomment %}
+{% block title %}Confronta{% endblock %}
+{% block top_title %}Confronta{% endblock %}
+{% block content %}
+    <div class="w3-container">
+    <table class="w3-table w3-striped">
+        <tr>
+            <th>Nome prodotto</th>
+            <th class="w3-center">{{ product_1.name|truncatechars:40 }}</th>
+            <th class="w3-center">{{ product_2.name|truncatechars:40 }}</th>
+        </tr>
+        <tr>
+            <th><b>Prezzo</b></th>
+            <th class="w3-center">{{ product_1.price }}€</th>
+            <th class="w3-center">{{ product_2.price }}€</th>
+        </tr>
+        <tr>
+            <th><b>Venditore</b></th>
+            <th class="w3-center"><a href="{% url 'decommerce:profile' product_1.seller.user.id %}">{{ product_1.seller.store_name }}</a></th>
+            <th class="w3-center"><a href="{% url 'decommerce:profile' product_2.seller.user.id %}">{{ product_2.seller.store_name }}</a></th>
+        </tr>
+        <tr>
+            <th><b>In stock</b></th>
+            <th class="w3-center">{% if product_1.product_available %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</th>
+            <th class="w3-center">{% if product_2.product_available %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</th>
+        </tr>
+        <tr>
+            <th><b>Voto</b></th>
+            <th class="w3-center">{% with ''|center:5 as range %}{% for i in range %}
+                        {% if forloop.counter <= product_1.stars_avg %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}</th>
+            <th class="w3-center">{% with ''|center:5 as range %}
+                    {% for i in range %}
+                        {% if forloop.counter <= product_2.stars_avg %}
+                            <i class="fa fa-star"></i>
+                        {% else %}
+                            <i class="fa fa-star-o"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% endwith %}</th>
+        </tr>
+        <tr>
+            <th><b>Scheda tecnica</b></th>
+            <th><textarea readonly rows="5" cols="30" style="resize: none; text-align: center" >{{ product_1.details }}</textarea></th>
+            <th><textarea readonly rows="5" cols="30" style="resize: none; text-align: center" >{{ product_2.details }}</textarea></th>
+        </tr>
+        <tr>
+            <th>Tags</th>
+            <th>{% for tag in product_1.tags.all %}<div class="w3-container w3-gray w3-text-white w3-round-xxlarge" 
+                                                        style="float: left; margin-left: 3px; margin-bottom: 3px">{{ tag }}</div>{% endfor %}</th>
+            <th>{% for tag in product_2.tags.all %}<div class="w3-container w3-gray w3-text-white w3-round-xxlarge" 
+                                                        style="float: left; margin-left: 3px; margin-bottom: 3px">{{ tag }}</div>{% endfor %}</th>
+        </tr>
+    </table>
+    </div>
+{% endblock %}
+{% block script %}
+    var rightButtons = document.getElementById('rightButtons');
+    var mySidebar = document.getElementById('mySidebar');
+    var contentDiv = document.getElementById('contentDiv');
+    var topMenu = document.getElementById('topMenu');
+    var hideLargeDiv = document.getElementById('hideLargeDiv');
+    rightButtons.style.display = 'none';
+    mySidebar.style.width = 0;
+    contentDiv.style.marginLeft = 0;
+    topMenu.style.display = 'none';
+    hideLargeDiv.style.display = 'none';
+
+    
+    function expand(id) {
+        var x = document.getElementById(id);
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+{% endblock %}

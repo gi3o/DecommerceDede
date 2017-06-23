@@ -41,6 +41,8 @@ urlpatterns = [
     url(r'^remove_cart/(?P<item_id>[0-9]+)/$', views.remove_cart, name='remove_cart'),
     # ex: /edit_tags/13
     url(r'^edit_tags/(?P<product_id>[0-9]+)/$', views.edit_tags, name='edit_tags'),
+    # es: /compare/11-45
+    url(r'^compare/(?P<id_1>[0-9]+)-(?P<id_2>[0-9]+)/$', views.compare_products, name='compare_products'),
     # ex: /checkout/
     url(r'^checkout/$', views.checkout, name='checkout'),
     # ex: /logout/

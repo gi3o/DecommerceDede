@@ -133,9 +133,10 @@
                         <div class="w3-center w3-margin-top">
                             <img src="{{ prod.image.url }}" style="max-width: 200px; max-height: 200px;">
                         </div>
-                        <div class="w3-display-middle w3-display-hover">
+                        <div class="w3-display-middle w3-display-hover w3-center">
                             <a class="w3-btn w3-black" href="{% url 'decommerce:product' prod.id %}"><i
                                     class="fa fa-info"></i> Dettagli</a>
+                            <a class="w3-btn w3-black" href="javascript:Popup('{% url 'decommerce:compare_products' product.id prod.id %}')">Confronta</a>
                         </div>
                         <p>{{ prod.name|truncatechars:65 }}<br>
                             <b>{{ prod.price }} Euro</b>
@@ -193,5 +194,9 @@
             x[i].style.display = "block";
         }
       }
+    }
+    
+    function Popup(page) {
+        window.open(page, "", style);
     }
 {% endblock %}
