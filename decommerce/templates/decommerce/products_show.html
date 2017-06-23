@@ -12,36 +12,40 @@
     </div>
 
     {% block products %}
-    <!-- Product grid -->
-    <div class="w3-row">
-        {% for product in product_list %}
-            <div class="w3-col l3 s6 w3-card w3-margin" style="height: 350px">
-                <div class="w3-container">
-                    <div class="w3-display-container">
-                        <div class="w3-center w3-margin-top">
-                            <img src="{{ product.image.url }}" style="max-width: 200px; max-height: 200px;">
+        <!-- Product grid -->
+        {% if product_list %}
+            <div class="w3-row">
+                {% for product in product_list %}
+                    <div class="w3-col l3 s6 w3-card w3-margin" style="height: 350px">
+                        <div class="w3-container">
+                            <div class="w3-display-container">
+                                <div class="w3-center w3-margin-top">
+                                    <img src="{{ product.image.url }}" style="max-width: 200px; max-height: 200px;">
+                                </div>
+                                <div class="w3-display-middle w3-display-hover">
+                                    <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
+                                            class="fa fa-info"></i> Dettagli</a>
+                                </div>
+                                <p>{{ product.name|truncatechars:65 }}<br>
+                                    <b>{{ product.price }} Euro</b>
+                                    <br>
+                                    {% with ''|center:5 as range %}
+                                        {% for i in range %}
+                                            {% if forloop.counter <= product.stars_avg %}
+                                                <i class="fa fa-star"></i>
+                                            {% else %}
+                                                <i class="fa fa-star-o"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                </p>
+                            </div>
                         </div>
-                        <div class="w3-display-middle w3-display-hover">
-                            <a class="w3-btn w3-black" href="{% url 'decommerce:product' product.id %}"><i
-                                    class="fa fa-info"></i> Dettagli</a>
-                        </div>
-                        <p>{{ product.name|truncatechars:65 }}<br>
-                            <b>{{ product.price }} Euro</b>
-                            <br>
-                            {% with ''|center:5 as range %}
-                                    {% for i in range %}
-                                        {% if forloop.counter <= product.stars_avg %}
-                                            <i class="fa fa-star"></i>
-                                        {% else %}
-                                            <i class="fa fa-star-o"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                            {% endwith %}
-                        </p>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
-        {% endblock %}
+        {% else %}
+            Nessun prodotto disponibile
+        {% endif %}
+    {% endblock %}
 {% endblock %}

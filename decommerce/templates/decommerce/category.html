@@ -6,10 +6,12 @@
 {% block title %}{{ actual_category.name }}{% endblock %}
 {% block top_title %}{{ actual_category.name }}{% endblock %}
 {% block body_title %}
-    {% blocktrans count product_list.count as products %}
-        {{ products }} prodotto
+    {% if products %}
+        {% blocktrans count product_list.count as products %}
+            {{ products }} prodotto
         {% plural %}
-        {{ products }} prodotti
-    {% endblocktrans %}
+            {{ products }} prodotti
+        {% endblocktrans %}
+    {% endif %}
 {% endblock %}
 

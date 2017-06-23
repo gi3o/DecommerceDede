@@ -3,6 +3,9 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+from django.views import generic
+
 from decommerce.forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
@@ -10,15 +13,16 @@ from random import random
 
 
 # Create your views here.
-def index(request):
-    product_list_ord = sorted(Product.objects.order_by('-added')[:9], key=lambda x: random())
-    return render(request, 'decommerce/index.html',
-                  context={'product_list': product_list_ord})
+class IndexView(generic.ListView):
+    template_name = 'decommerce/index.html'
+    context_object_name = 'product_list'
 
+    def get_queryset(self):
+        return sorted(Product.objects.filter(added__lte=timezone.now()).order_by('-added')[:9], key=lambda x: random())
 
 def category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    products = Product.objects.filter(category=category)
+    products = Product.objects.filter(category=category, added__lte=timezone.now())
     return render(request, 'decommerce/category.html',
                   context={'actual_category': category, 'product_list': products})
 
@@ -32,7 +36,8 @@ def add_review(request, product_id):
         product_review = ProductReview(product=get_object_or_404(Product, pk=product_id), by=user_profile,
                                        stars=data['stars'], title=data['title'], review=data['review'])
         product_review.save()
-    return HttpResponseRedirect('/product/' + str(product_id))
+    return HttpResponseRedirect(reverse('decommerce:product', args= [product_id]))
+    #return HttpResponseRedirect('/product/' + str(product_id))
 
 def product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -41,7 +46,8 @@ def product(request, product_id):
         buyer = UserProfile.objects.get(user=request.user)
         product.decrease_stock(quantity)
         buyer.cart.create(product=product, quantity=quantity)
-        return HttpResponseRedirect('/product/' + product_id)
+        return HttpResponseRedirect(reverse('decommerce:product', args=[product_id]))
+        #return HttpResponseRedirect('/product/' + product_id)
     else:
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
@@ -90,7 +96,7 @@ def login_view(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect(reverse('decommerce:index'))
                 else:
                     context.update({'errors': ['Il tuo account è stato disabilitato']})
             else:
@@ -102,7 +108,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(reverse('decommerce:index'))
 
 
 def register(request):
@@ -129,7 +135,7 @@ def register(request):
                 sellerProfile = SellerProfile(user=user, store_name=data['store_name'])
                 sellerProfile.save()
             login(request, user)
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('decommerce:index'))
         else:
             context.update({'errors': register_form.errors})
     return render(request, 'decommerce/register.html', context)
@@ -181,12 +187,12 @@ def buyer_profile(request, user, visitor=False):
             buyer.address = data['address']
             user.save()
             buyer.save()
-            return HttpResponseRedirect(request.get_full_path())
+            return HttpResponseRedirect(reverse('decommerce:profile', args= [user.id]))
         else:
             context.update({'errors': edit_user.errors})
     else:
         if user != request.user:
-            return HttpResponseRedirect('/account/' + str(request.user.id))
+            return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
     return render(request, 'decommerce/buyer_profile.html', context)
 
 
@@ -223,11 +229,12 @@ def add_product(request, user_id):
                     new_tag.save()
                     product.tags.add(new_tag)
             product.save()
-            return HttpResponseRedirect('/account/' + str(user_id))
+            return HttpResponseRedirect(reverse('decommerce:profile', args= [user_id]))
+            #return HttpResponseRedirect('/account/' + str(user_id))
         else:
             return HttpResponse('Upload failed: ' + str(form.errors))
     else:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('decommerce:index'))
 
 
 @login_required
@@ -235,7 +242,7 @@ def remove_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if SellerProfile.objects.get(user=request.user) == product.seller:
         product.delete()
-    return HttpResponseRedirect('/account/' + str(request.user.id))
+    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
 
 @login_required
 def edit_tags(request, product_id):
@@ -248,7 +255,7 @@ def edit_tags(request, product_id):
                 product.tags.add(Tag.objects.get(tag= tag))
             else:
                 product.tags.create(tag= tag)
-    return HttpResponseRedirect('/product_details/' + str(product_id))
+    return HttpResponseRedirect(reverse('decommerce:product_details', args=[product_id]))
 
 
 @login_required
@@ -266,7 +273,7 @@ def product_details(request, product_id):
         amount = int(request.POST['stock'])
         if amount > 0:
             product.increase_stock(amount)
-            return HttpResponseRedirect(request.get_full_path())
+            return HttpResponseRedirect(reverse('decommerce:product_details', args= [product_id]))
         else:
             context.update({'errors': ['Il numero di oggetti deve essere positivo']})
     return render(request, 'decommerce/product_details.html', context)
@@ -278,7 +285,7 @@ def remove_cart(request, item_id):
         item = CartItem.objects.get(id=item_id)
         item.product.increase_stock(item.quantity)
         UserProfile.objects.get(user=request.user).cart.get(id=int(item_id)).delete()
-    return HttpResponseRedirect('/account/' + str(request.user.id))
+    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
 
 
 @login_required
@@ -289,4 +296,4 @@ def checkout(request):
             order = Order(product=item.product, user=buyer, quantity=item.quantity)
             order.save()
             item.delete()
-    return HttpResponseRedirect('/account/' + str(request.user.id))
+    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))

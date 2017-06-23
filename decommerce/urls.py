@@ -20,7 +20,7 @@ from django.views import static
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.IndexView.as_view(), name='index'),
     # ex: /category/1/
     url(r'^category/(?P<category_id>[0-9]+)/$', views.category, name='category'),
     # ex: /product/12/
@@ -28,7 +28,7 @@ urlpatterns = [
     # ex: /search/
     url(r'^search/$', views.search, name='search'),
     # ex: /account/131
-    url(r'^account/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
+    url(r'^profile/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
     # ex: /add_product
     url(r'^add_product/(?P<user_id>[0-9]+)/$', views.add_product, name='add_product'),
     # ex: /remove_product/143
