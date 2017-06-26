@@ -149,7 +149,7 @@ STAR_CHOICES = [(1, '1'),
 
 class SellerReview(models.Model):
     seller = models.ForeignKey(SellerProfile, on_delete=models.CASCADE)
-    by = models.OneToOneField(UserProfile, null=True, on_delete=models.SET_NULL)
+    by = models.ForeignKey(UserProfile, null=True, on_delete=models.SET_NULL)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices=STAR_CHOICES)
     title = models.CharField(max_length=30, blank=False)
     review = models.TextField()
@@ -177,7 +177,7 @@ class Order(models.Model):
 
 class ProductReview(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    by = models.OneToOneField(UserProfile, null=True, on_delete=models.SET_NULL)
+    by = models.ForeignKey(UserProfile, null=True, on_delete=models.SET_NULL)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices=STAR_CHOICES)
     title = models.CharField(max_length=30, blank=False)
     review = models.CharField(max_length=280)
