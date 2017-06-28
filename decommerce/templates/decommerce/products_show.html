@@ -14,7 +14,7 @@
     {% block products %}
         <!-- Product grid -->
         {% if product_list %}
-            <div class="w3-row">
+            <div id="resultsContainer" class="w3-row">
                 {% for product in product_list %}
                     <div class="w3-col l3 s6 w3-card w3-margin" style="height: 350px">
                         <div class="w3-container">

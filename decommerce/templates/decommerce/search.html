@@ -12,4 +12,61 @@
         {{ products }} risultati
     {% endblocktrans %}
     per "{{ query }}"
+
+    <div class="w3-bar w3-black">
+        <form action="" method="post">
+        {% csrf_token %}
+        <a class= "w3-small w3-bar-item w3-block w3-light-grey w3-right">Ricerca Avanzata</a>
+        <div class="w3-dropdown-hover w3-black">
+            <button class="w3-button w3-mobile w3-small">Ordina per:</button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                    <button type="submit" name="minor_price" class="w3-bar-item w3-button w3-small">Prezzo minore</button>
+                    <button type="submit" name="major_price" class="w3-bar-item w3-button w3-small">Prezzo maggiore</button>
+                    <button type="submit" name="best_value" class="w3-bar-item w3-button w3-small">Valutazioni migliori</button>
+                    <button type="submit" name="less_value" class="w3-bar-item w3-button w3-small">Valutazioni peggiori</button>
+                    <button type="submit" name="date_time" class="w3-bar-item w3-button w3-small">Data inserimento</button>
+                </div>
+            </div>
+        <div class="w3-dropdown-hover w3-black">
+            <button class="w3-button w3-mobile w3-small">Prezzo:</button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                    <a href="#" class="w3-bar-item w3-button w3-small">0-10 &#8364</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">10-50 &#8364</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">50-100 &#8364</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">100-250 &#8364</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">250-500 &#8364</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">500+ &#8364</a>
+                </div>
+        </div>
+        <div class="w3-dropdown-hover w3-black">
+            <button class="w3-button w3-mobile w3-small">Categoria:</button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                 {% for category in categories %}
+                        <a href="#" class="w3-bar-item w3-button w3-small">{{ category.name }}</a>
+                 {% endfor %}
+                </div>
+        </div>
+        <div class="w3-dropdown-hover w3-black">
+            <button class="w3-button w3-mobile w3-small">Stelle:</button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9734&#9734&#9734&#9734</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9734&#9734&#9734</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9734&#9734</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9734</a>
+                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9733</a>
+                </div>
+        </div>
+        <div class="w3-dropdown-hover w3-black">
+          <!-- <input type="text" class="w3-bar-item w3-input w3-small w3-left" placeholder="tag#1, tag#2">
+            <a href="#" class="w3-bar-item w3-button w3-green w3-small">Go</a> -->
+            <button class="w3-button w3-mobile w3-small">Tag:</button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4" style="max-height: 200px; overflow-y: auto;">
+                    {%  for tag in tag_list %}
+                        <a href="#" id="{{ tag }}" class="w3-bar-item w3-button w3-small">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+        </div>
+        </form>
+    </div>
+
 {% endblock %}

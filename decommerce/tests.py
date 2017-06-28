@@ -9,7 +9,7 @@ from django.utils import timezone
 from decommerce.models import SellerProfile, Product, Category
 
 
-# Create your tests here.
+# Create your tests herel.
 
 class ProductMethodTests(TestCase):
     def test_decrease_product_stock_below_zero(self):

@@ -20,6 +20,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return sorted(Product.objects.filter(added__lte=timezone.now()).order_by('-added')[:9], key=lambda x: random())
 
+
 def category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
     products = Product.objects.filter(category=category, added__lte=timezone.now())
@@ -79,8 +80,11 @@ def search_term(term):
 def search(request):
     if request.method == 'POST':
         query = request.POST['search']
+        results = search_term(query)
+        if 'minor_price' in request.POST:
+            results.sort(key= lambda x: x.price)
         return render(request, 'decommerce/search.html',
-                      context={'query': query, 'product_list': search_term(query)})
+                      context={'query': query, 'product_list': search_term(query), 'tag_list': Tag.objects.all()})
     else:
         return render(request, 'decommerce/search_form.html')
 
