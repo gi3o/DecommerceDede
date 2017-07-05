@@ -156,8 +156,7 @@ def register(request):
         else:
             context.update({'errors': register_form.errors})
     return render(request, 'decommerce/register.html', context)
-
-
+    
 @login_required
 def seller_profile(request, user, visitor=False):
     seller = SellerProfile.objects.get(user=user)
@@ -167,6 +166,16 @@ def seller_profile(request, user, visitor=False):
     seller_review_form = SellerReviewForm()
     context = {'seller': seller, 'products': products, 'seller_reviews': seller_reviews}
     template = 'decommerce/seller_profile.html'
+    if request.POST:
+        form = SellerReviewForm(request.POST)
+        user_profile = UserProfile.objects.get(user = request.user)
+        if form.is_valid():
+            data = form.cleaned_data
+            review = SellerReview(seller=seller, by=user_profile, stars=data['stars'],
+                        title=data['title'], review=data['review'])
+            review.save()
+        else:
+            return HttpResponse(form.errors)
     if visitor:
         context.update({'review_form': seller_review_form})
         template = 'decommerce/seller_profile_visitor.html'
