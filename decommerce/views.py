@@ -262,8 +262,10 @@ def seller_profile(request, user, visitor=False):
     template = 'decommerce/seller_profile.html'
     if request.POST:
         form = SellerReviewForm(request.POST)
-        user_profile = UserProfile.objects.get(user = request.user)
-        if form.is_valid():
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        if SellerReview.objects.filter(by=user_profile).exists():
+            pass
+        elif form.is_valid():
             data = form.cleaned_data
             review = SellerReview(seller=seller, by=user_profile, stars=data['stars'],
                         title=data['title'], review=data['review'])
