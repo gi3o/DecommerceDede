@@ -80,11 +80,22 @@ def search_term(term):
 def search(request):
     if request.method == 'POST':
         query = request.POST['search']
-        results = search_term(query)
-        if 'minor_price' in request.POST:
-            results.sort(key= lambda x: x.price)
         return render(request, 'decommerce/search.html',
                       context={'query': query, 'product_list': search_term(query), 'tag_list': Tag.objects.all()})
+    else:
+        return render(request, 'decommerce/search_form.html')
+
+
+def adv_search(request):
+    if request.method == 'POST':
+        query = request.POST['query']
+        product_list = search_term(query)
+        if 'minor_price' in request.POST:
+            product_list.sort(key=lambda x: x.price)
+        elif 'major_price' in request.POST:
+            product_list.sort(key=lambda x: x.price, reverse=True)
+        return render(request, 'decommerce/search.html',
+                    context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all()})
     else:
         return render(request, 'decommerce/search_form.html')
 

@@ -49,6 +49,8 @@ urlpatterns = [
     url(r'^logout/$', views.logout_view, name='logout'),
     # used to handle login
     url(r'^login/$', views.login_view, name='login'),
+    # used for advanced search
+    url(r'^advanced_search/$', views.adv_search, name='advanced_search'),
     # used to handle registration
     url(r'^register/$', views.register, name = 'register'),
     # used to get media files

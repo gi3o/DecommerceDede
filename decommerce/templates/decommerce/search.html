@@ -14,8 +14,9 @@
     per "{{ query }}"
 
     <div class="w3-bar w3-black">
-        <form action="" method="post">
+        <form action="{% url 'decommerce:advanced_search' %}" method="post">
         {% csrf_token %}
+        <input type="hidden" name="query" value="{{ query }}">
         <a class= "w3-small w3-bar-item w3-block w3-light-grey w3-right">Ricerca Avanzata</a>
         <div class="w3-dropdown-hover w3-black">
             <button class="w3-button w3-mobile w3-small">Ordina per:</button>
