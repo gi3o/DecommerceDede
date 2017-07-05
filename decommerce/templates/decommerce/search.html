@@ -40,7 +40,7 @@
                 </div>
         </div>
         <div class="w3-dropdown-hover w3-black">
-            <button class="w3-button w3-mobile w3-small">Categoria:</button>
+            <a class="w3-button w3-mobile w3-small">Categoria:</a>
                 <div class="w3-dropdown-content w3-bar-block w3-card-4">
                  {% for category in categories %}
                         <button type="submit" name= "{{ category.name }}"class="w3-bar-item w3-button w3-small">{{ category.name }}</button>
@@ -48,7 +48,7 @@
                 </div>
         </div>
         <div class="w3-dropdown-hover w3-black">
-            <button class="w3-button w3-mobile w3-small">Stelle:</button>
+            <a class="w3-button w3-mobile w3-small">Stelle:</a>
                 <div class="w3-dropdown-content w3-bar-block w3-card-4">
                     <button type="submit" name= "1_star" class="w3-bar-item w3-button w3-small">&#9733&#9734&#9734&#9734&#9734</button>
                     <button type="submit" name= "2_star" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9734&#9734&#9734</button>
@@ -60,10 +60,10 @@
         <div class="w3-dropdown-hover w3-black">
           <!-- <input type="text" class="w3-bar-item w3-input w3-small w3-left" placeholder="tag#1, tag#2">
             <a href="#" class="w3-bar-item w3-button w3-green w3-small">Go</a> -->
-            <button class="w3-button w3-mobile w3-small">Tag:</button>
+            <a class="w3-button w3-mobile w3-small">Tag:</a>
                 <div class="w3-dropdown-content w3-bar-block w3-card-4" style="max-height: 200px; overflow-y: auto;">
                     {%  for tag in tag_list %}
-                        <a href="#" id="{{ tag }}" class="w3-bar-item w3-button w3-small">{{ tag }}</a>
+                        <button type="submit" name= "{{ tag }}" id="{{ tag }}" class="w3-bar-item w3-button w3-small">{{ tag }}</button>
                     {% endfor %}
                 </div>
         </div>
