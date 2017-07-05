@@ -94,6 +94,7 @@ def adv_search(request):
             product_list.sort(key=lambda x: x.price)
         elif 'major_price' in request.POST:
             product_list.sort(key=lambda x: x.price, reverse=True)
+        elif 'best_value' in request.POST:
         return render(request, 'decommerce/search.html',
                     context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all()})
     else:
