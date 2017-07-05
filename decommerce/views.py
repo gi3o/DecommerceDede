@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib.auth import logout, authenticate, login
 from django.db import IntegrityError
 from django.db.models import Q
@@ -74,7 +75,7 @@ def search_term(term):
         for product in Product.objects.all():
             if tag_term in product.tags.all():
                 query_set.append(product)
-    return query_set
+    return list(set(query_set))
 
 
 def search(request):
@@ -96,6 +97,22 @@ def adv_search(request):
             product_list.sort(key=lambda x: x.price, reverse=True)
         elif 'best_value' in request.POST:
             product_list.sort(key=lambda x: x.stars_avg, reverse=True)
+        elif 'less_value' in request.POST:
+            product_list.sort(key=lambda x: x.stars_avg)
+        elif 'date_time' in request.POST:
+            product_list.sort(key=lambda x: x.added)
+        elif 'prize_1' in request.POST:
+            print(product_list)
+            supp = product_list
+            for prod in supp:
+                if prod.price.compare_total(Decimal('10.00')) == Decimal('1'):
+                    print('Removing', prod)
+                    product_list.remove(prod)
+        elif 'prize_2' in request.POST:
+            for product in product_list:
+                if ((product.price < Decimal('10')) and (product.price > Decimal('50'))):
+                    print('Removing', product)
+                    product_list.remove(product)
         return render(request, 'decommerce/search.html',
                     context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all()})
     else:
