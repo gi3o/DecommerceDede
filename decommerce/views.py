@@ -179,17 +179,27 @@ def adv_search(request):
         elif '1_star' in request.POST:
             supp = list(product_list)
             for prod in supp:
-                if(prod.calculateAverageVotes() > 1):
+                if(prod.calculateAverageVotes() >=2):
                     product_list.remove(prod)
         elif '2_star' in request.POST:
             supp = list(product_list)
             for prod in supp:
-                if(prod.calculateAverageVotes() > 2):
+                if((prod.calculateAverageVotes() < 2) and (prod.calculateAverageVotes() >=3)):
                     product_list.remove(prod)
         elif '3_star' in request.POST:
             supp = list(product_list)
             for prod in supp:
-                if(prod.calculateAverageVotes() > 3):
+                if((prod.calculateAverageVotes() < 3) and (prod.calculateAverageVotes() >=4)):
+                    product_list.remove(prod)
+        elif '4_star' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.calculateAverageVotes() < 4) and (prod.calculateAverageVotes() >= 5)):
+                    product_list.remove(prod)
+        elif '5_star' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if (prod.calculateAverageVotes() < 5):
                     product_list.remove(prod)
         return render(request, 'decommerce/search.html',
                     context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all()})
