@@ -102,17 +102,95 @@ def adv_search(request):
         elif 'date_time' in request.POST:
             product_list.sort(key=lambda x: x.added)
         elif 'prize_1' in request.POST:
-            print(product_list)
-            supp = product_list
+            supp = list(product_list)
             for prod in supp:
                 if prod.price.compare_total(Decimal('10.00')) == Decimal('1'):
-                    print('Removing', prod)
                     product_list.remove(prod)
         elif 'prize_2' in request.POST:
-            for product in product_list:
-                if ((product.price < Decimal('10')) and (product.price > Decimal('50'))):
-                    print('Removing', product)
-                    product_list.remove(product)
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.price.compare_total(Decimal('10.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('50.00')) == Decimal('1'))):
+                    product_list.remove(prod)
+        elif 'prize_3' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.price.compare_total(Decimal('50.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('100.00')) == Decimal('1'))):
+                    product_list.remove(prod)
+        elif 'prize_4' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.price.compare_total(Decimal('100.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('250.00')) == Decimal('1'))):
+                    product_list.remove(prod)
+        elif 'prize_5' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.price.compare_total(Decimal('250.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('500.00')) == Decimal('1'))):
+                    product_list.remove(prod)
+        elif 'prize_6' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if ((prod.price.compare_total(Decimal('500.00')) == Decimal(-1))):
+                    product_list.remove(prod)
+        elif 'Elettronica' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Elettronica')):
+                    product_list.remove(prod)
+        elif 'Abbigliamento' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Abbigliamento')):
+                    product_list.remove(prod)
+        elif 'Musica' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Musica')):
+                    product_list.remove(prod)
+        elif 'Giocattoli' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Giocattoli')):
+                    product_list.remove(prod)
+        elif 'Giardinaggio' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Giardinaggio')):
+                    product_list.remove(prod)
+        elif 'Libri' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Libri')):
+                    product_list.remove(prod)
+        elif 'Orologi' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Orologi')):
+                    product_list.remove(prod)
+        elif 'Sport' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Sport')):
+                    product_list.remove(prod)
+        elif 'Strumenti Musicali' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.category != Category.objects.get(name='Strumenti Musicali')):
+                    product_list.remove(prod)
+        elif '1_star' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.calculateAverageVotes() > 1):
+                    product_list.remove(prod)
+        elif '2_star' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.calculateAverageVotes() > 2):
+                    product_list.remove(prod)
+        elif '3_star' in request.POST:
+            supp = list(product_list)
+            for prod in supp:
+                if(prod.calculateAverageVotes() > 3):
+                    product_list.remove(prod)
         return render(request, 'decommerce/search.html',
                     context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all()})
     else:

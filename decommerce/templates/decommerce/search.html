@@ -33,28 +33,28 @@
                 <div class="w3-dropdown-content w3-bar-block w3-card-4">
                     <button type="submit" name="prize_1" class="w3-bar-item w3-button w3-small">0-10 &#8364</button>
                     <button type="submit" name="prize_2" class="w3-bar-item w3-button w3-small">10-50 &#8364</button>
-                    <a href="#" class="w3-bar-item w3-button w3-small">50-100 &#8364</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">100-250 &#8364</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">250-500 &#8364</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">500+ &#8364</a>
+                    <button type="submit" name="prize_3" class="w3-bar-item w3-button w3-small">50-100 &#8364</button>
+                    <button type="submit" name="prize_4" class="w3-bar-item w3-button w3-small">100-250 &#8364</button>
+                    <button type="submit" name="prize_5" class="w3-bar-item w3-button w3-small">250-500 &#8364</button>
+                    <button type="submit" name="prize_6" class="w3-bar-item w3-button w3-small">500+ &#8364</button>
                 </div>
         </div>
         <div class="w3-dropdown-hover w3-black">
             <button class="w3-button w3-mobile w3-small">Categoria:</button>
                 <div class="w3-dropdown-content w3-bar-block w3-card-4">
                  {% for category in categories %}
-                        <a href="#" class="w3-bar-item w3-button w3-small">{{ category.name }}</a>
+                        <button type="submit" name= "{{ category.name }}"class="w3-bar-item w3-button w3-small">{{ category.name }}</button>
                  {% endfor %}
                 </div>
         </div>
         <div class="w3-dropdown-hover w3-black">
             <button class="w3-button w3-mobile w3-small">Stelle:</button>
                 <div class="w3-dropdown-content w3-bar-block w3-card-4">
-                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9734&#9734&#9734&#9734</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9734&#9734&#9734</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9734&#9734</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9734</a>
-                    <a href="#" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9733</a>
+                    <button type="submit" name= "1_star" class="w3-bar-item w3-button w3-small">&#9733&#9734&#9734&#9734&#9734</button>
+                    <button type="submit" name= "2_star" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9734&#9734&#9734</button>
+                    <button type="submit" name= "3_star" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9734&#9734</button>
+                    <button type="submit" name= "4_star" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9734</button>
+                    <button type="submit" name= "5_star" class="w3-bar-item w3-button w3-small">&#9733&#9733&#9733&#9733&#9733</button>
                 </div>
         </div>
         <div class="w3-dropdown-hover w3-black">
