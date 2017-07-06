@@ -180,7 +180,7 @@ class ProductReview(models.Model):
     by = models.ForeignKey(UserProfile, null=True, on_delete=models.SET_NULL)
     stars = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], choices=STAR_CHOICES)
     title = models.CharField(max_length=30, blank=False)
-    review = models.CharField(max_length=280)
+    review = models.TextField()
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

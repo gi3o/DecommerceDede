@@ -41,6 +41,9 @@ class RegisterForm(forms.Form):
     password = forms.CharField(label = 'Password',
                                widget=forms.PasswordInput(
                                    attrs={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Password'}))
+    password_confirm = forms.CharField(label = 'Password',
+                               widget=forms.PasswordInput(
+                                   attrs={'class':'w3-input w3-margin-bottom w3-third', 'placeholder':'Conferma Password'}))
     type = forms.ChoiceField(label='Tipo', choices=REGISTER_CHOICES, widget=forms.Select(
                                 attrs={'class':'w3-select w3-input w3-margin-bottom w3-third'}))
     nationality = forms.ChoiceField(label='Nazionalità', choices=NATION_CHOICES, widget=forms.Select(

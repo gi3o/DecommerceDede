@@ -1,5 +1,6 @@
 from decimal import Decimal
 from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
@@ -9,11 +10,17 @@ from django.views import generic
 
 from decommerce.forms import *
 from .models import *
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from random import random
 
 
 # Create your views here.
+def buyer_check(user):
+    return user.groups.filter(name='Buyer').exists()
+
+def seller_check(user):
+    return user.groups.filter(name='Seller').exists()
+
 class IndexView(generic.ListView):
     template_name = 'decommerce/index.html'
     context_object_name = 'product_list'
@@ -30,6 +37,7 @@ def category(request, category_id):
 
 
 @login_required
+@user_passes_test(seller_check)
 def add_review(request, product_id):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     form = ProductReviewForm(request.POST)
@@ -39,7 +47,6 @@ def add_review(request, product_id):
                                        stars=data['stars'], title=data['title'], review=data['review'])
         product_review.save()
     return HttpResponseRedirect(reverse('decommerce:product', args= [product_id]))
-    #return HttpResponseRedirect('/product/' + str(product_id))
 
 def product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -49,7 +56,6 @@ def product(request, product_id):
         product.decrease_stock(quantity)
         buyer.cart.create(product=product, quantity=quantity)
         return HttpResponseRedirect(reverse('decommerce:product', args=[product_id]))
-        #return HttpResponseRedirect('/product/' + product_id)
     else:
         category = product.category
         reviews = ProductReview.objects.filter(product=product)
@@ -230,6 +236,9 @@ def register(request):
         context.update({'register_form': register_form})
         if register_form.is_valid():
             data = register_form.cleaned_data
+            if data['password'] != data['password_confirm']:
+                context.update({'errors': ['Le password devono coincidere']})
+                return render(request, 'decommerce/register.html', context)
             if User.objects.filter(email=data['mail']).exists():
                 context.update({'errors': ['Questo indirizzo email è già in uso']})
                 return render(request, 'decommerce/register.html', context)
@@ -242,9 +251,11 @@ def register(request):
             if data['type'] == 'Compratore':
                 userProfile = UserProfile(user=user, nationality=data['nationality'], address=data['address'])
                 userProfile.save()
+                Group.objects.get(name='Buyer').user_set.add(user)
             elif data['type'] == 'Venditore':
                 sellerProfile = SellerProfile(user=user, store_name=data['store_name'])
                 sellerProfile.save()
+                Group.objects.get(name='Seller').user_set.add(user)
             login(request, user)
             return HttpResponseRedirect(reverse('decommerce:index'))
         else:
@@ -260,7 +271,6 @@ def seller_profile(request, user, visitor=False):
     seller_review_form = SellerReviewForm()
     context = {'seller': seller, 'products': products, 'seller_reviews': seller_reviews}
     template = 'decommerce/seller_profile.html'
-
     if SellerReview.objects.filter(by=get_object_or_404(UserProfile, user=request.user)).exists():
         pass
         if request.POST:
@@ -282,7 +292,8 @@ def seller_profile(request, user, visitor=False):
 
 
 @login_required
-def buyer_profile(request, user, visitor=False):
+@user_passes_test(buyer_check)
+def buyer_profile(request, user):
     buyer = get_object_or_404(UserProfile, user=user)
     orders_made = Order.objects.filter(user=buyer)
     edit_user = ModifyUserDataForm(
@@ -322,18 +333,16 @@ def buyer_profile(request, user, visitor=False):
 @login_required
 def profile(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    visitor = False
-    if str(request.user.id) != user_id:
-        visitor = True
     if UserProfile.objects.filter(user=user).exists():
-        return buyer_profile(request, user, visitor)
+        return buyer_profile(request, user)
     elif SellerProfile.objects.filter(user=user).exists():
-        return seller_profile(request, user, visitor)
+        return seller_profile(request, user, visitor = str(request.user.id) != user_id)
     else:
         return HttpResponse('You\'re user: ' + user.get_username())
 
 
 @login_required
+@user_passes_test(seller_check)
 def add_product(request, user_id):
     if request.method == 'POST':
         form = UploadProductForm(request.POST, request.FILES)
@@ -353,7 +362,6 @@ def add_product(request, user_id):
                     product.tags.add(new_tag)
             product.save()
             return HttpResponseRedirect(reverse('decommerce:profile', args= [user_id]))
-            #return HttpResponseRedirect('/account/' + str(user_id))
         else:
             return HttpResponse('Upload failed: ' + str(form.errors))
     else:
@@ -361,6 +369,7 @@ def add_product(request, user_id):
 
 
 @login_required
+@user_passes_test(seller_check)
 def remove_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if SellerProfile.objects.get(user=request.user) == product.seller:
@@ -368,6 +377,7 @@ def remove_product(request, product_id):
     return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
 
 @login_required
+@user_passes_test(seller_check)
 def edit_tags(request, product_id):
     if request.method == 'POST':
         product = Product.objects.get(pk= product_id)
@@ -382,6 +392,7 @@ def edit_tags(request, product_id):
 
 
 @login_required
+@user_passes_test(seller_check)
 def product_details(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     orders = Order.objects.filter(product=product)
@@ -403,6 +414,7 @@ def product_details(request, product_id):
 
 
 @login_required
+@user_passes_test(buyer_check)
 def remove_cart(request, item_id):
     if request.method == "POST":
         item = CartItem.objects.get(id=item_id)
@@ -412,6 +424,7 @@ def remove_cart(request, item_id):
 
 
 @login_required
+@user_passes_test(buyer_check)
 def checkout(request):
     if UserProfile.objects.filter(user=request.user).exists():
         buyer = UserProfile.objects.get(user=request.user)
@@ -423,6 +436,7 @@ def checkout(request):
     
     
 @login_required
+@user_passes_test(buyer_check)
 def compare_products(request, id_1, id_2):
     product_1 = get_object_or_404(Product, pk=id_1)
     product_2 = get_object_or_404(Product, pk=id_2)

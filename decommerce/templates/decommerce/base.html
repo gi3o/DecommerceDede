@@ -33,6 +33,7 @@
         <a href="{% url 'decommerce:index' %}" title="DECOMMERCE | Home" style="text-decoration: none"><h3
                 class="w3-wide"><b>DECOMMERCE</b></h3>
         </a>
+        {% if request.user.is_authenticated %}<p>Benvenuto, {{ request.user.username }}</p>{% endif %}
     </div>
     {% block sidebar %}{% endblock %}
     <div class="w3-large w3-text-grey" style="font-weight:bold">
@@ -83,6 +84,7 @@
             <a href="{% url 'decommerce:login' %}" class="w3-bar-item w3-right w3-button" title="Login"><i
                     id="loginIcon" class="fa fa-sign-in"></i></a>
         {% endif %}
+        {% if is_buyer %}
         <div class="w3-dropdown-click w3-right">
             <button class="w3-button" onclick="expand('cart')"><i class="fa fa-shopping-cart"></i></button>
             <div id="cart" class="w3-dropdown-content w3-bar-block w3-card" style="z-index: 1000">
@@ -108,6 +110,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
         <form id="searchForm" action="{% url 'decommerce:search' %}" method="post">
             {% csrf_token %}
             <input id="searchField" class="w3-bar-item w3-right w3-input w3-round-xxlarge w3-border" name="search"
