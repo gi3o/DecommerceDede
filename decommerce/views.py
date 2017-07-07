@@ -58,7 +58,7 @@ def product(request, product_id):
         return HttpResponseRedirect(reverse('decommerce:product', args=[product_id]))
     else:
         category = product.category
-        reviews = ProductReview.objects.filter(product=product)
+        reviews = ProductReview.objects.filter(product=product, date__lte=timezone.now())
         review_form = ProductReviewForm()
         context = {'actual_category': category, 'product': product,
                    'review_form': review_form, 'related_products': product.related_products(5)}
@@ -266,28 +266,29 @@ def register(request):
 def seller_profile(request, user, visitor=False):
     seller = SellerProfile.objects.get(user=user)
     products = Product.objects.filter(seller=seller)
-    seller_reviews = SellerReview.objects.filter(seller=seller)
+    seller_reviews = SellerReview.objects.filter(seller=seller, date__lte=timezone.now())
     upload_product_form = UploadProductForm()
     seller_review_form = SellerReviewForm()
     context = {'seller': seller, 'products': products, 'seller_reviews': seller_reviews}
     template = 'decommerce/seller_profile.html'
-    if SellerReview.objects.filter(by=get_object_or_404(UserProfile, user=request.user)).exists():
-        pass
-        if request.POST:
-            form = SellerReviewForm(request.POST)
-            user_profile = get_object_or_404(UserProfile, user=request.user)
-            if form.is_valid():
-                data = form.cleaned_data
-                review = SellerReview(seller=seller, by=user_profile, stars=data['stars'],
-                            title=data['title'], review=data['review'])
-                review.save()
-            else:
-                return HttpResponse(form.errors)
-        if visitor:
-            context.update({'review_form': seller_review_form})
-            template = 'decommerce/seller_profile_visitor.html'
+    if request.POST:
+        form = SellerReviewForm(request.POST)
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        if form.is_valid():
+            data = form.cleaned_data
+            review = SellerReview(seller=seller, by=user_profile, stars=data['stars'],
+                        title=data['title'], review=data['review'])
+            review.save()
         else:
-            context.update({'product_form': upload_product_form})
+            return HttpResponse(form.errors)
+    if visitor:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if SellerReview.objects.filter(by=user_profile).exists():
+            context.update({'review_already_written': True, 'errors':['Hai già scritto una recensione per questo venditore']})
+        context.update({'review_form': seller_review_form, 'seller_reviews':seller_reviews})
+        template = 'decommerce/seller_profile_visitor.html'
+    else:
+        context.update({'product_form': upload_product_form})
     return render(request, template, context)
 
 

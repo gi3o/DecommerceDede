@@ -30,6 +30,7 @@
         </button>
     </div>
 
+    {% if cart %}
     <div class="w3-container">
         <ul class="w3-ul">
             <li><h3>Carrello:</h3></li>
@@ -46,9 +47,10 @@
             </form>
         </ul>
     </div>
+    {% endif %}
 
     <div class="w3-container" style="max-height: 500px; overflow-y: auto">
-        <p>Ordini effettuati:</p>
+        <h3>Ordini effettuati:</h3>
         {% for order in orders %}
             <div class="w3-card w3-row w3-margin-bottom">
                 <div class="w3-container w3-gray">{{ order.date }}</div>
@@ -67,7 +69,7 @@
                     {% endif %}
                 </div>
                 <div class="w3-col w3-right" style="max-height: 150px; max-width: 150px">
-                    <img src="{{ order.product.image.url }}" style="width: 100%"/>
+                    <img src="{{ order.product.image.url }}" style="height: auto; width: auto; max-width: 200px; max-height: 130px;"/>
                 </div>
             </div>
         {% endfor %}

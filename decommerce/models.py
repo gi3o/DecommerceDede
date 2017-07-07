@@ -160,6 +160,7 @@ class SellerReview(models.Model):
 
     class Meta:
         verbose_name = _('seller review')
+        unique_together = ('seller', 'by')
 
 
 class Order(models.Model):
@@ -188,3 +189,4 @@ class ProductReview(models.Model):
 
     class Meta:
         verbose_name = _('product review')
+        unique_together = ('product', 'by')
