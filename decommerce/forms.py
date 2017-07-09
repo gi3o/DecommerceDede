@@ -28,7 +28,7 @@ class LoginForm(forms.Form):
 
 REGISTER_CHOICES = [('Compratore','Compratore'), ('Venditore','Venditore')]
 NATION_CHOICES = [('ITA', 'Italia'),
-                  ('ENG', 'Ingilterra'),
+                  ('ENG', 'Inghilterra'),
                   ('USA', 'Stati Uniti'),
                   ('FRA', 'Francia'),
                   ('SPA', 'Spagna')]

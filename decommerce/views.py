@@ -18,8 +18,10 @@ from random import random
 def buyer_check(user):
     return user.groups.filter(name='Buyer').exists()
 
+
 def seller_check(user):
     return user.groups.filter(name='Seller').exists()
+
 
 class IndexView(generic.ListView):
     template_name = 'decommerce/index.html'
@@ -37,7 +39,7 @@ def category(request, category_id):
 
 
 @login_required
-@user_passes_test(seller_check)
+@user_passes_test(buyer_check)
 def add_review(request, product_id):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     form = ProductReviewForm(request.POST)
@@ -46,7 +48,8 @@ def add_review(request, product_id):
         product_review = ProductReview(product=get_object_or_404(Product, pk=product_id), by=user_profile,
                                        stars=data['stars'], title=data['title'], review=data['review'])
         product_review.save()
-    return HttpResponseRedirect(reverse('decommerce:product', args= [product_id]))
+    return HttpResponseRedirect(reverse('decommerce:product', args=[product_id]))
+
 
 def product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
@@ -71,13 +74,14 @@ def product(request, product_id):
             context.update({'reviews': reviews, 'product_available': product.product_available})
         return render(request, 'decommerce/product.html', context)
 
+
 def search_term(term):
     query_set = []
     for prod in Product.objects.filter(
-                Q(name__contains= term) | Q(details__contains= term) | Q(seller__store_name__contains= term)):
-            query_set.append(prod)
-    if Tag.objects.filter(tag= term).exists():
-        tag_term = Tag.objects.get(tag= term)
+                            Q(name__contains=term) | Q(details__contains=term) | Q(seller__store_name__contains=term)):
+        query_set.append(prod)
+    if Tag.objects.filter(tag=term).exists():
+        tag_term = Tag.objects.get(tag=term)
         for product in Product.objects.all():
             if tag_term in product.tags.all():
                 query_set.append(product)
@@ -88,7 +92,8 @@ def search(request):
     if request.method == 'POST':
         query = request.POST['search']
         return render(request, 'decommerce/search.html',
-                      context={'query': query, 'product_list': search_term(query), 'tag_list': Tag.objects.all().order_by('tag')})
+                      context={'query': query, 'product_list': search_term(query),
+                               'tag_list': Tag.objects.all().order_by('tag')})
     else:
         return render(request, 'decommerce/search_form.html')
 
@@ -114,19 +119,23 @@ def adv_search(request):
                     product_list.remove(prod)
         elif 'prize_2' in request.POST:
             for prod in supp:
-                if ((prod.price.compare_total(Decimal('10.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('50.00')) == Decimal('1'))):
+                if ((prod.price.compare_total(Decimal('10.00')) == Decimal(-1)) or (
+                    prod.price.compare_total(Decimal('50.00')) == Decimal('1'))):
                     product_list.remove(prod)
         elif 'prize_3' in request.POST:
             for prod in supp:
-                if ((prod.price.compare_total(Decimal('50.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('100.00')) == Decimal('1'))):
+                if ((prod.price.compare_total(Decimal('50.00')) == Decimal(-1)) or (
+                    prod.price.compare_total(Decimal('100.00')) == Decimal('1'))):
                     product_list.remove(prod)
         elif 'prize_4' in request.POST:
             for prod in supp:
-                if ((prod.price.compare_total(Decimal('100.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('250.00')) == Decimal('1'))):
+                if ((prod.price.compare_total(Decimal('100.00')) == Decimal(-1)) or (
+                    prod.price.compare_total(Decimal('250.00')) == Decimal('1'))):
                     product_list.remove(prod)
         elif 'prize_5' in request.POST:
             for prod in supp:
-                if ((prod.price.compare_total(Decimal('250.00')) == Decimal(-1)) or (prod.price.compare_total(Decimal('500.00')) == Decimal('1'))):
+                if ((prod.price.compare_total(Decimal('250.00')) == Decimal(-1)) or (
+                    prod.price.compare_total(Decimal('500.00')) == Decimal('1'))):
                     product_list.remove(prod)
         elif 'prize_6' in request.POST:
             for prod in supp:
@@ -134,55 +143,55 @@ def adv_search(request):
                     product_list.remove(prod)
         elif 'Elettronica' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Elettronica')):
+                if (prod.category != Category.objects.get(name='Elettronica')):
                     product_list.remove(prod)
         elif 'Abbigliamento' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Abbigliamento')):
+                if (prod.category != Category.objects.get(name='Abbigliamento')):
                     product_list.remove(prod)
         elif 'Musica' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Musica')):
+                if (prod.category != Category.objects.get(name='Musica')):
                     product_list.remove(prod)
         elif 'Giocattoli' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Giocattoli')):
+                if (prod.category != Category.objects.get(name='Giocattoli')):
                     product_list.remove(prod)
         elif 'Giardinaggio' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Giardinaggio')):
+                if (prod.category != Category.objects.get(name='Giardinaggio')):
                     product_list.remove(prod)
         elif 'Libri' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Libri')):
+                if (prod.category != Category.objects.get(name='Libri')):
                     product_list.remove(prod)
         elif 'Orologi' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Orologi')):
+                if (prod.category != Category.objects.get(name='Orologi')):
                     product_list.remove(prod)
         elif 'Sport' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Sport')):
+                if (prod.category != Category.objects.get(name='Sport')):
                     product_list.remove(prod)
         elif 'Strumenti Musicali' in request.POST:
             for prod in supp:
-                if(prod.category != Category.objects.get(name='Strumenti Musicali')):
+                if (prod.category != Category.objects.get(name='Strumenti Musicali')):
                     product_list.remove(prod)
         elif '1_star' in request.POST:
             for prod in supp:
-                if(prod.calculateAverageVotes() >=2):
+                if (prod.calculateAverageVotes() >= 2):
                     product_list.remove(prod)
         elif '2_star' in request.POST:
             for prod in supp:
-                if((prod.calculateAverageVotes() < 2) or (prod.calculateAverageVotes() >=3)):
+                if ((prod.calculateAverageVotes() < 2) or (prod.calculateAverageVotes() >= 3)):
                     product_list.remove(prod)
         elif '3_star' in request.POST:
             for prod in supp:
-                if((prod.calculateAverageVotes() < 3) or (prod.calculateAverageVotes() >=4)):
+                if ((prod.calculateAverageVotes() < 3) or (prod.calculateAverageVotes() >= 4)):
                     product_list.remove(prod)
         elif '4_star' in request.POST:
             for prod in supp:
-                if ((prod.calculateAverageVotes() < 4) or    (prod.calculateAverageVotes() >= 5)):
+                if ((prod.calculateAverageVotes() < 4) or (prod.calculateAverageVotes() >= 5)):
                     product_list.remove(prod)
         elif '5_star' in request.POST:
             for prod in supp:
@@ -193,11 +202,13 @@ def adv_search(request):
             for tag in Tag.objects.all():
                 if tag.tag in request.POST:
                     tag_selected = tag.tag
+                    break
             for prod in supp:
                 if not prod.tags.all().filter(tag=tag_selected).exists():
                     product_list.remove(prod)
         return render(request, 'decommerce/search.html',
-                    context={'query': query, 'product_list': product_list, 'tag_list': Tag.objects.all().order_by('tag')})
+                      context={'query': query, 'product_list': product_list,
+                               'tag_list': Tag.objects.all().order_by('tag')})
     else:
         return render(request, 'decommerce/search_form.html')
 
@@ -261,7 +272,8 @@ def register(request):
         else:
             context.update({'errors': register_form.errors})
     return render(request, 'decommerce/register.html', context)
-    
+
+
 @login_required
 def seller_profile(request, user, visitor=False):
     seller = SellerProfile.objects.get(user=user)
@@ -277,15 +289,17 @@ def seller_profile(request, user, visitor=False):
         if form.is_valid():
             data = form.cleaned_data
             review = SellerReview(seller=seller, by=user_profile, stars=data['stars'],
-                        title=data['title'], review=data['review'])
+                                  title=data['title'], review=data['review'])
             review.save()
+            return HttpResponseRedirect(reverse('decommerce:profile', args=[user.id]))
         else:
-            return HttpResponse(form.errors)
+            context.update({'errors': form.errors})
     if visitor:
         user_profile = UserProfile.objects.get(user=request.user)
         if SellerReview.objects.filter(by=user_profile).exists():
-            context.update({'review_already_written': True, 'errors':['Hai già scritto una recensione per questo venditore']})
-        context.update({'review_form': seller_review_form, 'seller_reviews':seller_reviews})
+            context.update(
+                {'review_already_written': True, 'errors': ['Hai già scritto una recensione per questo venditore']})
+        context.update({'review_form': seller_review_form, 'seller_reviews': seller_reviews})
         template = 'decommerce/seller_profile_visitor.html'
     else:
         context.update({'product_form': upload_product_form})
@@ -322,12 +336,12 @@ def buyer_profile(request, user):
             buyer.address = data['address']
             user.save()
             buyer.save()
-            return HttpResponseRedirect(reverse('decommerce:profile', args= [user.id]))
+            return HttpResponseRedirect(reverse('decommerce:profile', args=[user.id]))
         else:
             context.update({'errors': edit_user.errors})
     else:
         if user != request.user:
-            return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
+            return HttpResponseRedirect(reverse('decommerce:profile', args=[request.user.id]))
     return render(request, 'decommerce/buyer_profile.html', context)
 
 
@@ -337,7 +351,7 @@ def profile(request, user_id):
     if UserProfile.objects.filter(user=user).exists():
         return buyer_profile(request, user)
     elif SellerProfile.objects.filter(user=user).exists():
-        return seller_profile(request, user, visitor = str(request.user.id) != user_id)
+        return seller_profile(request, user, visitor=str(request.user.id) != user_id)
     else:
         return HttpResponse('You\'re user: ' + user.get_username())
 
@@ -355,14 +369,14 @@ def add_product(request, user_id):
             product.save()
             tags = list(filter(None, data['tags'].lower().split(", ")))
             for tag in tags:
-                if Tag.objects.filter(tag= tag).exists():
-                    product.tags.add(Tag.objects.get(tag = tag))
+                if Tag.objects.filter(tag=tag).exists():
+                    product.tags.add(Tag.objects.get(tag=tag))
                 else:
-                    new_tag = Tag(tag= tag)
+                    new_tag = Tag(tag=tag)
                     new_tag.save()
                     product.tags.add(new_tag)
             product.save()
-            return HttpResponseRedirect(reverse('decommerce:profile', args= [user_id]))
+            return HttpResponseRedirect(reverse('decommerce:profile', args=[user_id]))
         else:
             return HttpResponse('Upload failed: ' + str(form.errors))
     else:
@@ -375,20 +389,21 @@ def remove_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     if SellerProfile.objects.get(user=request.user) == product.seller:
         product.delete()
-    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
+    return HttpResponseRedirect(reverse('decommerce:profile', args=[request.user.id]))
+
 
 @login_required
 @user_passes_test(seller_check)
 def edit_tags(request, product_id):
     if request.method == 'POST':
-        product = Product.objects.get(pk= product_id)
+        product = Product.objects.get(pk=product_id)
         tags = list(filter(None, request.POST['tags'].lower().split(", ")))
         product.tags.clear()
         for tag in tags:
-            if Tag.objects.filter(tag= tag).exists():
-                product.tags.add(Tag.objects.get(tag= tag))
+            if Tag.objects.filter(tag=tag).exists():
+                product.tags.add(Tag.objects.get(tag=tag))
             else:
-                product.tags.create(tag= tag)
+                product.tags.create(tag=tag)
     return HttpResponseRedirect(reverse('decommerce:product_details', args=[product_id]))
 
 
@@ -408,7 +423,7 @@ def product_details(request, product_id):
         amount = int(request.POST['stock'])
         if amount > 0:
             product.increase_stock(amount)
-            return HttpResponseRedirect(reverse('decommerce:product_details', args= [product_id]))
+            return HttpResponseRedirect(reverse('decommerce:product_details', args=[product_id]))
         else:
             context.update({'errors': ['Il numero di oggetti deve essere positivo']})
     return render(request, 'decommerce/product_details.html', context)
@@ -421,7 +436,7 @@ def remove_cart(request, item_id):
         item = CartItem.objects.get(id=item_id)
         item.product.increase_stock(item.quantity)
         UserProfile.objects.get(user=request.user).cart.get(id=int(item_id)).delete()
-    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
+    return HttpResponseRedirect(reverse('decommerce:profile', args=[request.user.id]))
 
 
 @login_required
@@ -433,21 +448,13 @@ def checkout(request):
             order = Order(product=item.product, user=buyer, quantity=item.quantity)
             order.save()
             item.delete()
-    return HttpResponseRedirect(reverse('decommerce:profile', args= [request.user.id]))
-    
-    
+    return HttpResponseRedirect(reverse('decommerce:profile', args=[request.user.id]))
+
+
 @login_required
 @user_passes_test(buyer_check)
 def compare_products(request, id_1, id_2):
     product_1 = get_object_or_404(Product, pk=id_1)
     product_2 = get_object_or_404(Product, pk=id_2)
-    context = {'product_1':product_1, 'product_2':product_2}
+    context = {'product_1': product_1, 'product_2': product_2}
     return render(request, 'decommerce/compare_products.html', context)
-    
-    
-    
-    
-    
-    
-    
-    

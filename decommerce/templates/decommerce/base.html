@@ -95,7 +95,7 @@
                                 {{ item.quantity }} x {{ item.product.name }}
                             </a>
                             <img class="w3-col w3-right w3-circle" src="{{ item.product.image.url }}"
-                                 style="width: 50px">
+                                 style="width: auto; height: auto; max-height: 60px;">
                         </div>
                     {% endfor %}
                     <div class="w3-gray w3-text-white">Totale: {{ cart_total }}</div>
